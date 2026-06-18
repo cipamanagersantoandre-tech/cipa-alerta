@@ -679,7 +679,6 @@
     display: none;
 }
 
-
     </style>
 </head>
 <body>
@@ -697,22 +696,20 @@
     </div>
 
     <!-- Lado direito: Botões -->
-<div style="display: flex; gap: 8px; flex-wrap: wrap;">
-    <button class="btn-topo" id="btnSalvarRascunho" style="background: #6b7280; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-        💾 Salvar Rascunho
-    </button>
-    <button class="btn-topo" id="btnEnviarSetor" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-        📤 Enviar para o Setor
-    </button>
-    <button class="btn-topo" id="btnDevolverAlerta" style="background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-        📤 Devolver Alerta
-    </button>
-    <button class="btn-topo" id="btnImprimirTopo" style="background: #1e466e; color: white; border: 2px solid white; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-        🖨️ Imprimir
-    </button>
-    <button class="btn-topo" id="btnGerenciarDestinatarios" style="background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-        📋 Gerenciar Destinatários
-    </button>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn-topo" id="btnSalvarRascunho" style="background: #6b7280; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            💾 Salvar Rascunho
+        </button>
+        <button class="btn-topo" id="btnEnviarSetor" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            📤 Enviar para o Setor
+        </button>
+        <button class="btn-topo" id="btnDevolverAlerta" style="background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            📤 Devolver Alerta
+        </button>
+        <button class="btn-topo" id="btnImprimirTopo" style="background: #1e466e; color: white; border: 2px solid white; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+            🖨️ Imprimir
+        </button>
+    </div>
 </div>
 
 <!-- PAINEL DE CONFIGURAÇÕES (NÃO IMPRIME) -->
@@ -722,47 +719,27 @@
         <button id="btnToggleConfig" style="background: #1e466e; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">▼ Mostrar</button>
     </div>
     <div id="configContent" style="display: none; margin-top: 10px;">
-        <!-- Email da CIPA -->
-        <div style="margin-bottom: 10px;">
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📧 Email da CIPA (retorno):</label>
-            <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-            <small style="color: #6b7280;">Separe múltiplos emails por vírgula</small>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email da CIPA (retorno):</label>
+                <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div>
+                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setor Responsável:</label>
+                <select id="setorResponsavel" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="">Selecione o setor...</option>
+                </select>
+            </div>
         </div>
-
-        <!-- Nome do Responsável -->
-        <div style="margin-bottom: 10px;">
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Nome do Responsável (CIPA):</label>
-            <input type="text" id="nomeResponsavel" placeholder="João Silva - CIPA" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-            <small style="color: #6b7280;">Nome que vai aparecer no email</small>
-        </div>
-
         <div style="margin-top: 10px;">
-            <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">💾 Salvar Configurações</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL GERENCIAR DESTINATÁRIOS -->
-<div id="modalDestinatarios" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: white; border-radius: 8px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="margin: 0; color: #1e466e;">📋 Gerenciar Lista de Destinatários</h3>
-            <button id="btnFecharModalDestinatarios" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
-        </div>
-
-        <!-- Formulário para adicionar -->
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
-            <input type="text" id="novoDestinatarioNome" placeholder="Nome (ex: Produção)" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-            <input type="text" id="novoDestinatarioEmail" placeholder="Email" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-            <button id="btnAdicionarDestinatarioModal" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
-        </div>
-
-        <!-- Lista -->
-        <div id="listaDestinatariosModal" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;"></div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #ddd; padding-top: 15px;">
-            <button id="btnFecharModalDestinatarios2" style="background: #6b7280; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Fechar</button>
-            <button id="btnSalvarDestinatarios" style="background: #16a34a; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">💾 Salvar Lista</button>
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
+            <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <input type="text" id="novoSetorEmail" placeholder="Email do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 4px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
+            </div>
+            <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
         </div>
     </div>
 </div>
@@ -821,12 +798,6 @@
         <div class="info-item">📌 Ocorrência: <input type="text" id="ocorrencia" placeholder="ex: trajeto / incidente"></div>
         <div class="info-item">📍 Local: <input type="text" id="local" placeholder="setor / área"></div>
         <div class="info-item">👥 Público-alvo: <input type="text" id="publico" placeholder="CIPA / equipes / terceiros"></div>
-<div class="info-item">📤 Enviar para:
-    <select id="selectDestinatario" style="width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px;">
-        <option value="">Selecione um destinatário...</option>
-    </select>
-    <input type="text" id="emailDestinoManual" placeholder="Ou digite um email" style="width: 100%; padding: 6px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px;">
-</div>
     </div>
 
     <!-- COLUNAS 1 e 2 -->
@@ -1089,19 +1060,6 @@ function atualizarStatus(status) {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Quando selecionar um destinatário, preencher o email automaticamente
-    const selectDest = document.getElementById('selectDestinatario');
-    if (selectDest) {
-        selectDest.addEventListener('change', function() {
-            const emailInput = document.getElementById('emailDestinoManual');
-            if (this.value) {
-                emailInput.value = this.value;
-            } else {
-                emailInput.value = '';
-            }
-        });
-    }
-
     // ===== BOTÕES DA BARRA SUPERIOR =====
 
     // Botão Salvar Rascunho
@@ -1130,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Botão Devolver Alerta da parte inferior
+    // Botão Devolver Alerta da parte inferior (se existir)
     const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
     if (btnDevolverInferior) {
         btnDevolverInferior.addEventListener('click', devolverAlerta);
@@ -1146,9 +1104,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ===== CONFIGURAÇÕES =====
     
-    // Toggle do painel
+    // Toggle do painel de configuração
     const btnToggle = document.getElementById('btnToggleConfig');
     const configContent = document.getElementById('configContent');
+    
     if (btnToggle && configContent) {
         btnToggle.addEventListener('click', function() {
             if (configContent.style.display === 'none') {
@@ -1161,94 +1120,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Adicionar destinatário
-    const btnAdicionar = document.getElementById('btnAdicionarDestinatario');
+    // Botão adicionar setor
+    const btnAdicionar = document.getElementById('btnAdicionarSetor');
     if (btnAdicionar) {
         btnAdicionar.addEventListener('click', function() {
-            const nome = document.getElementById('novoDestinatarioNome').value.trim();
-            const email = document.getElementById('novoDestinatarioEmail').value.trim();
+            const nome = document.getElementById('novoSetorNome').value.trim();
+            const email = document.getElementById('novoSetorEmail').value.trim();
             
             if (!nome) {
-                showAlert('❌ Digite o nome do destinatário!', 'error');
+                showAlert('❌ Digite o nome do setor!', 'error');
                 return;
             }
             if (!email) {
-                showAlert('❌ Digite o email do destinatário!', 'error');
-                return;
-            }
-            if (!email.includes('@')) {
-                showAlert('❌ Email inválido!', 'error');
+                showAlert('❌ Digite o email do setor!', 'error');
                 return;
             }
             
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-            if (!config.destinatarios) config.destinatarios = [];
+            const config = JSON.parse(localStorage.getItem('config_informe') || '{"setores":[]}');
+            if (!config.setores) config.setores = [];
             
-            if (config.destinatarios.some(d => d.email === email)) {
-                showAlert('❌ Este email já está cadastrado!', 'error');
+            if (config.setores.some(s => s.nome === nome)) {
+                showAlert('❌ Este setor já está cadastrado!', 'error');
                 return;
             }
             
-            config.destinatarios.push({ nome, email });
+            config.setores.push({ nome, email });
             localStorage.setItem('config_informe', JSON.stringify(config));
             
-            document.getElementById('novoDestinatarioNome').value = '';
-            document.getElementById('novoDestinatarioEmail').value = '';
+            document.getElementById('novoSetorNome').value = '';
+            document.getElementById('novoSetorEmail').value = '';
             
-            renderizarDestinatarios(config.destinatarios);
-            showAlert('✅ Destinatário adicionado!', 'success');
+            renderizarSetores(config.setores);
+            popularSelectSetores(config.setores);
+            showAlert('✅ Setor adicionado!', 'success');
         });
     }
     
-    // Salvar configurações
+    // Botão salvar configurações
     const btnSalvarConfig = document.getElementById('btnSalvarConfig');
     if (btnSalvarConfig) {
         btnSalvarConfig.addEventListener('click', salvarConfiguracoes);
     }
     
-    // Carregar configurações
+    // Carregar configurações ao iniciar
     carregarConfiguracoes();
-
-    // ===== GERENCIAR DESTINATÁRIOS (MODAL) =====
-    
-    // Botão na barra superior
-    const btnGerenciar = document.getElementById('btnGerenciarDestinatarios');
-    if (btnGerenciar) {
-        btnGerenciar.addEventListener('click', abrirModalDestinatarios);
-    }
-    
-    // Fechar modal (X)
-    const btnFechar = document.getElementById('btnFecharModalDestinatarios');
-    if (btnFechar) {
-        btnFechar.addEventListener('click', fecharModalDestinatarios);
-    }
-    
-    // Fechar modal (botão Fechar)
-    const btnFechar2 = document.getElementById('btnFecharModalDestinatarios2');
-    if (btnFechar2) {
-        btnFechar2.addEventListener('click', fecharModalDestinatarios);
-    }
-    
-    // Adicionar destinatário no modal
-    const btnAdicionarModal = document.getElementById('btnAdicionarDestinatarioModal');
-    if (btnAdicionarModal) {
-        btnAdicionarModal.addEventListener('click', salvarDestinatariosModal);
-    }
-    
-    // Salvar lista (fecha o modal)
-    const btnSalvarLista = document.getElementById('btnSalvarDestinatarios');
-    if (btnSalvarLista) {
-        btnSalvarLista.addEventListener('click', function() {
-            fecharModalDestinatarios();
-            showAlert('✅ Lista salva!', 'success');
-        });
-    }
 
     // Carregar alerta ao abrir a página
     carregarAlerta();
 });
-
-
 // ===== DEVOLVER ALERTA =====
 
 async function devolverAlerta() {
@@ -1397,6 +1316,7 @@ async function salvarRascunho() {
 async function enviarParaSetor() {
     const alertaId = document.getElementById('alertaId').value;
     
+    // Se não tiver ID, gerar um novo
     if (!alertaId) {
         const novoId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
         document.getElementById('alertaId').value = novoId;
@@ -1405,6 +1325,7 @@ async function enviarParaSetor() {
     
     const idAtual = document.getElementById('alertaId').value;
     
+    // Validar campos mínimos
     const titulo = document.getElementById('tituloAlerta').value.trim();
     const oque = document.getElementById('oqueAconteceu').value.trim();
     
@@ -1413,31 +1334,7 @@ async function enviarParaSetor() {
         return;
     }
     
-    // Pegar o email do campo manual ou do select
-    let emailDestino = document.getElementById('emailDestinoManual').value.trim();
-    let nomeDestino = '';
-    
-    // Se o email veio do select, pegar o nome também
-    const selectDest = document.getElementById('selectDestinatario');
-    if (selectDest && selectDest.value && selectDest.value === emailDestino) {
-        nomeDestino = selectDest.options[selectDest.selectedIndex]?.dataset?.nome || '';
-    }
-    
-    // Se não tiver email, pedir para digitar
-    if (!emailDestino) {
-        emailDestino = prompt('📧 Digite o email do destinatário:');
-        if (!emailDestino) {
-            showAlert('❌ Envio cancelado', 'info');
-            return;
-        }
-    }
-    
-    if (!emailDestino.includes('@')) {
-        showAlert('❌ Email inválido!', 'error');
-        return;
-    }
-    
-    const nomeResponsavel = document.getElementById('nomeResponsavel').value.trim() || 'CIPA';
+    // Coletar dados
     const dados = {
         titulo: titulo,
         ocorrencia: document.getElementById('ocorrencia').value.trim(),
@@ -1449,24 +1346,46 @@ async function enviarParaSetor() {
         prevencao1: document.getElementById('prevencao1').value.trim(),
         prevencao2: document.getElementById('prevencao2').value.trim(),
         prevencao3: document.getElementById('prevencao3').value.trim(),
-        elaboradoPor: nomeResponsavel,
+        elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
         dataAlerta: document.getElementById('dataAlerta').value,
         unidade: document.getElementById('unidadeAlerta').value.trim(),
-        emailDestino: emailDestino,
-        nomeDestino: nomeDestino || emailDestino,
         status: 'Enviado',
         dataEnvio: new Date().toISOString()
     };
     
     try {
-        await salvarAlertaNaPlanilha(idAtual, dados);
+        // 1. Salvar na planilha
+        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
+        if (resultado.status !== 'sucesso') {
+            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
+            return;
+        }
+        
         atualizarStatus('Enviado');
         showAlert('✅ Alerta salvo!', 'success');
         
+        // 2. Perguntar o email de destino
+        const emailDestino = prompt(
+            '📧 Digite o email do destinatário (coordenador do setor):\n\n' +
+            'Exemplo: coordenador@empresa.com'
+        );
+        
+        if (!emailDestino) {
+            showAlert('❌ Envio cancelado - email não informado', 'info');
+            return;
+        }
+        
+        if (!emailDestino.includes('@')) {
+            showAlert('❌ Email inválido!', 'error');
+            return;
+        }
+        
+        // 3. Enviar email
         const assunto = `🚨 Alerta de Segurança - ${dados.titulo}`;
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
+        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'CIPA';
         
-        const corpo = `Prezado(a) ${dados.nomeDestino},
+        const corpo = `Prezado(a) Coordenador(a),
 
 A CIPA registrou um alerta de segurança que requer sua análise.
 
@@ -1476,7 +1395,7 @@ A CIPA registrou um alerta de segurança que requer sua análise.
 🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
 🔹 Local: ${dados.local || 'Não informado'}
 
-📋 Descrição:
+📋 Descrição do ocorrido:
 ${dados.oqueAconteceu}
 
 ${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
@@ -1492,8 +1411,13 @@ Instruções:
 Atenciosamente,
 ${nomeResponsavel}`;
 
-        await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
-        showAlert(`📧 Email enviado para ${dados.nomeDestino} (${emailDestino})!`, 'success');
+        const emailResultado = await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
+        
+        if (emailResultado.status === 'sucesso') {
+            showAlert(`📧 Email enviado para ${emailDestino}!`, 'success');
+        } else {
+            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
+        }
         
     } catch (error) {
         console.error('Erro:', error);
@@ -1506,17 +1430,16 @@ ${nomeResponsavel}`;
 // ===== CONFIGURAÇÕES DE SETORES =====
 
 // Carregar configurações do localStorage
-// ===== CONFIGURAÇÕES =====
-
 function carregarConfiguracoes() {
     try {
         const config = JSON.parse(localStorage.getItem('config_informe'));
         if (config) {
-            if (config.emailCIPA) document.getElementById('emailCIPA').value = config.emailCIPA;
-            if (config.nomeResponsavel) document.getElementById('nomeResponsavel').value = config.nomeResponsavel;
-            if (config.destinatarios) {
-                renderizarDestinatarios(config.destinatarios);
-                popularSelectDestinatarios(config.destinatarios);
+            if (config.emailCIPA) {
+                document.getElementById('emailCIPA').value = config.emailCIPA;
+            }
+            if (config.setores) {
+                renderizarSetores(config.setores);
+                popularSelectSetores(config.setores);
             }
         }
     } catch (e) {
@@ -1524,156 +1447,71 @@ function carregarConfiguracoes() {
     }
 }
 
+// Salvar configurações no localStorage
 function salvarConfiguracoes() {
-    const destinatarios = [];
-    document.querySelectorAll('#listaDestinatarios .destinatario-item').forEach(el => {
+    const setores = [];
+    document.querySelectorAll('#listaSetores .setor-item').forEach(el => {
         const nome = el.dataset.nome;
         const email = el.dataset.email;
-        if (nome && email) destinatarios.push({ nome, email });
+        if (nome) setores.push({ nome, email });
     });
     
     const config = {
         emailCIPA: document.getElementById('emailCIPA').value.trim(),
-        nomeResponsavel: document.getElementById('nomeResponsavel').value.trim(),
-        destinatarios: destinatarios
+        setores: setores
     };
     
     localStorage.setItem('config_informe', JSON.stringify(config));
-    popularSelectDestinatarios(destinatarios);
+    popularSelectSetores(setores);
     showAlert('✅ Configurações salvas!', 'success');
 }
 
-function renderizarDestinatarios(destinatarios) {
-    const container = document.getElementById('listaDestinatarios');
-    if (!destinatarios || destinatarios.length === 0) {
-        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum destinatário cadastrado</span>';
+// Renderizar setores na lista
+function renderizarSetores(setores) {
+    const container = document.getElementById('listaSetores');
+    if (!setores || setores.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum setor cadastrado</span>';
         return;
     }
     
-    container.innerHTML = destinatarios.map((d, i) => `
-        <span class="destinatario-item" data-nome="${d.nome}" data-email="${d.email}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-            👤 ${d.nome} → ${d.email}
-            <button class="btn-remover-destinatario" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
+    container.innerHTML = setores.map((s, i) => `
+        <span class="setor-item" data-nome="${s.nome}" data-email="${s.email}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+            ${s.nome} (${s.email})
+            <button class="btn-remover-setor" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
         </span>
     `).join('');
     
-    document.querySelectorAll('.btn-remover-destinatario').forEach(btn => {
+    document.querySelectorAll('.btn-remover-setor').forEach(btn => {
         btn.addEventListener('click', function() {
             const index = parseInt(this.dataset.index);
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-            if (config.destinatarios) {
-                config.destinatarios.splice(index, 1);
+            const config = JSON.parse(localStorage.getItem('config_informe') || '{"setores":[]}');
+            if (config.setores) {
+                config.setores.splice(index, 1);
                 localStorage.setItem('config_informe', JSON.stringify(config));
-                renderizarDestinatarios(config.destinatarios);
-                popularSelectDestinatarios(config.destinatarios);
-                showAlert('Destinatário removido!', 'info');
+                renderizarSetores(config.setores);
+                popularSelectSetores(config.setores);
+                showAlert('Setor removido!', 'info');
             }
         });
     });
 }
 
-function popularSelectDestinatarios(destinatarios) {
-    const select = document.getElementById('selectDestinatario');
+// Popular o select de setores
+function popularSelectSetores(setores) {
+    const select = document.getElementById('setorResponsavel');
     if (!select) return;
     
-    select.innerHTML = '<option value="">Selecione um destinatário...</option>';
-    if (destinatarios) {
-        destinatarios.forEach(d => {
+    select.innerHTML = '<option value="">Selecione o setor...</option>';
+    if (setores) {
+        setores.forEach(s => {
             const option = document.createElement('option');
-            option.value = d.email;
-            option.textContent = d.nome + ' → ' + d.email;
-            option.dataset.nome = d.nome;
+            option.value = s.nome;
+            option.textContent = s.nome;
+            option.dataset.email = s.email;
             select.appendChild(option);
         });
     }
 }
-
-// ===== GERENCIAR DESTINATÁRIOS (MODAL) =====
-
-function abrirModalDestinatarios() {
-    const modal = document.getElementById('modalDestinatarios');
-    modal.classList.add('active');
-    modal.style.display = 'flex';
-    carregarListaDestinatariosModal();
-}
-
-function fecharModalDestinatarios() {
-    const modal = document.getElementById('modalDestinatarios');
-    modal.classList.remove('active');
-    modal.style.display = 'none';
-}
-
-function carregarListaDestinatariosModal() {
-    const container = document.getElementById('listaDestinatariosModal');
-    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-    const destinatarios = config.destinatarios || [];
-    
-    if (destinatarios.length === 0) {
-        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum destinatário cadastrado</span>';
-        return;
-    }
-    
-    container.innerHTML = destinatarios.map((d, i) => `
-        <span class="destinatario-item-modal" data-index="${i}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-            👤 ${d.nome} → ${d.email}
-            <button class="btn-remover-destinatario-modal" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
-        </span>
-    `).join('');
-    
-    document.querySelectorAll('.btn-remover-destinatario-modal').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-            if (config.destinatarios) {
-                config.destinatarios.splice(index, 1);
-                localStorage.setItem('config_informe', JSON.stringify(config));
-                carregarListaDestinatariosModal();
-                popularSelectDestinatarios(config.destinatarios);
-                renderizarDestinatarios(config.destinatarios);
-                showAlert('Destinatário removido!', 'info');
-            }
-        });
-    });
-}
-
-function salvarDestinatariosModal() {
-    const nome = document.getElementById('novoDestinatarioNome').value.trim();
-    const email = document.getElementById('novoDestinatarioEmail').value.trim();
-    
-    if (!nome) {
-        showAlert('❌ Digite o nome do destinatário!', 'error');
-        return;
-    }
-    if (!email) {
-        showAlert('❌ Digite o email do destinatário!', 'error');
-        return;
-    }
-    if (!email.includes('@')) {
-        showAlert('❌ Email inválido!', 'error');
-        return;
-    }
-    
-    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-    if (!config.destinatarios) config.destinatarios = [];
-    
-    if (config.destinatarios.some(d => d.email === email)) {
-        showAlert('❌ Este email já está cadastrado!', 'error');
-        return;
-    }
-    
-    config.destinatarios.push({ nome, email });
-    localStorage.setItem('config_informe', JSON.stringify(config));
-    
-    document.getElementById('novoDestinatarioNome').value = '';
-    document.getElementById('novoDestinatarioEmail').value = '';
-    
-    carregarListaDestinatariosModal();
-    popularSelectDestinatarios(config.destinatarios);
-    renderizarDestinatarios(config.destinatarios);
-    showAlert('✅ Destinatário adicionado!', 'success');
-}
-
-// Renderizar setores na lista
 
 function showAlert(message, type = 'success') {
     const container = document.getElementById('alertContainer');
