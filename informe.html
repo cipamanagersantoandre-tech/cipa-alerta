@@ -733,16 +733,19 @@
             <small style="color: #6b7280;">Nome que vai aparecer no email</small>
         </div>
 
-        <!-- Lista de Destinatários -->
+        <!-- GERENCIAR LISTA DE DESTINATÁRIOS -->
         <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px;">📋 Destinatários Cadastrados:</label>
-            <div id="listaDestinatarios" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;"></div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                <input type="text" id="novoDestinatarioNome" placeholder="Nome do setor/pessoa" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px;">📋 Gerenciar Lista de Destinatários:</label>
+            
+            <!-- Formulário para adicionar à lista -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px;">
+                <input type="text" id="novoDestinatarioNome" placeholder="Nome (ex: Produção)" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
                 <input type="text" id="novoDestinatarioEmail" placeholder="Email" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <button id="btnAdicionarDestinatario" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
+                <button id="btnAdicionarDestinatario" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar à Lista</button>
             </div>
-            <small style="color: #6b7280;">Exemplo: "Produção" + "producao@empresa.com"</small>
+            
+            <!-- Lista de destinatários cadastrados -->
+            <div id="listaDestinatarios" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
         </div>
 
         <div style="margin-top: 10px;">
@@ -805,6 +808,12 @@
         <div class="info-item">📌 Ocorrência: <input type="text" id="ocorrencia" placeholder="ex: trajeto / incidente"></div>
         <div class="info-item">📍 Local: <input type="text" id="local" placeholder="setor / área"></div>
         <div class="info-item">👥 Público-alvo: <input type="text" id="publico" placeholder="CIPA / equipes / terceiros"></div>
+<div class="info-item">📤 Enviar para:
+    <select id="selectDestinatario" style="width: 100%; padding: 6px; border: 1px solid #aaa; border-radius: 4px;">
+        <option value="">Selecione um destinatário...</option>
+    </select>
+    <input type="text" id="emailDestinoManual" placeholder="Ou digite um email" style="width: 100%; padding: 6px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px;">
+</div>
     </div>
 
     <!-- COLUNAS 1 e 2 -->
@@ -1066,6 +1075,19 @@ function atualizarStatus(status) {
 // ===== BOTÃO DEVOLVER ALERTA =====
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Quando selecionar um destinatário, preencher o email automaticamente
+    const selectDest = document.getElementById('selectDestinatario');
+    if (selectDest) {
+        selectDest.addEventListener('change', function() {
+            const emailInput = document.getElementById('emailDestinoManual');
+            if (this.value) {
+                emailInput.value = this.value;
+            } else {
+                emailInput.value = '';
+            }
+        });
+    }
 
     // ===== BOTÕES DA BARRA SUPERIOR =====
 
@@ -1343,34 +1365,23 @@ async function enviarParaSetor() {
         return;
     }
     
-    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
-    const destinatarios = config.destinatarios || [];
-    
-    let mensagem = '📧 Digite o email do destinatário:\n\n';
-    if (destinatarios.length > 0) {
-        mensagem += '📋 Destinatários cadastrados:\n';
-        destinatarios.forEach((d, i) => {
-            mensagem += (i+1) + '. ' + d.nome + ' → ' + d.email + '\n';
-        });
-        mensagem += '\n💡 Digite o número da lista ou digite um email novo.';
-    } else {
-        mensagem += '💡 Nenhum destinatário cadastrado. Digite um email.';
-    }
-    
-    const resposta = prompt(mensagem);
-    if (!resposta) {
-        showAlert('❌ Envio cancelado', 'info');
-        return;
-    }
-    
-    let emailDestino = resposta.trim();
+    // Pegar o email do campo manual ou do select
+    let emailDestino = document.getElementById('emailDestinoManual').value.trim();
     let nomeDestino = '';
     
-    const numero = parseInt(resposta);
-    if (!isNaN(numero) && numero >= 1 && numero <= destinatarios.length) {
-        const selecionado = destinatarios[numero - 1];
-        emailDestino = selecionado.email;
-        nomeDestino = selecionado.nome;
+    // Se o email veio do select, pegar o nome também
+    const selectDest = document.getElementById('selectDestinatario');
+    if (selectDest && selectDest.value && selectDest.value === emailDestino) {
+        nomeDestino = selectDest.options[selectDest.selectedIndex]?.dataset?.nome || '';
+    }
+    
+    // Se não tiver email, pedir para digitar
+    if (!emailDestino) {
+        emailDestino = prompt('📧 Digite o email do destinatário:');
+        if (!emailDestino) {
+            showAlert('❌ Envio cancelado', 'info');
+            return;
+        }
     }
     
     if (!emailDestino.includes('@')) {
@@ -1457,6 +1468,7 @@ function carregarConfiguracoes() {
             if (config.nomeResponsavel) document.getElementById('nomeResponsavel').value = config.nomeResponsavel;
             if (config.destinatarios) {
                 renderizarDestinatarios(config.destinatarios);
+                popularSelectDestinatarios(config.destinatarios);
             }
         }
     } catch (e) {
@@ -1479,6 +1491,7 @@ function salvarConfiguracoes() {
     };
     
     localStorage.setItem('config_informe', JSON.stringify(config));
+    popularSelectDestinatarios(destinatarios);
     showAlert('✅ Configurações salvas!', 'success');
 }
 
@@ -1491,7 +1504,7 @@ function renderizarDestinatarios(destinatarios) {
     
     container.innerHTML = destinatarios.map((d, i) => `
         <span class="destinatario-item" data-nome="${d.nome}" data-email="${d.email}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-            👤 ${d.nome} (${d.email})
+            👤 ${d.nome} → ${d.email}
             <button class="btn-remover-destinatario" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
         </span>
     `).join('');
@@ -1504,10 +1517,27 @@ function renderizarDestinatarios(destinatarios) {
                 config.destinatarios.splice(index, 1);
                 localStorage.setItem('config_informe', JSON.stringify(config));
                 renderizarDestinatarios(config.destinatarios);
+                popularSelectDestinatarios(config.destinatarios);
                 showAlert('Destinatário removido!', 'info');
             }
         });
     });
+}
+
+function popularSelectDestinatarios(destinatarios) {
+    const select = document.getElementById('selectDestinatario');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">Selecione um destinatário...</option>';
+    if (destinatarios) {
+        destinatarios.forEach(d => {
+            const option = document.createElement('option');
+            option.value = d.email;
+            option.textContent = d.nome + ' → ' + d.email;
+            option.dataset.nome = d.nome;
+            select.appendChild(option);
+        });
+    }
 }
 
 // Renderizar setores na lista
