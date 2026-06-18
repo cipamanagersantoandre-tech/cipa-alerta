@@ -1095,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Botão Devolver Alerta da parte inferior (se existir)
+    // Botão Devolver Alerta da parte inferior
     const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
     if (btnDevolverInferior) {
         btnDevolverInferior.addEventListener('click', devolverAlerta);
@@ -1109,24 +1109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ===== CONFIGURAÇÕES =====
-    
-    // Toggle do painel de configuração
-    const btnToggle = document.getElementById('btnToggleConfig');
-    const configContent = document.getElementById('configContent');
-    
-    if (btnToggle && configContent) {
-        btnToggle.addEventListener('click', function() {
-            if (configContent.style.display === 'none') {
-                configContent.style.display = 'block';
-                btnToggle.textContent = '▲ Ocultar';
-            } else {
-                configContent.style.display = 'none';
-                btnToggle.textContent = '▼ Mostrar';
-            }
-        });
-    }
-    
     // ===== CONFIGURAÇÕES =====
     
     // Toggle do painel
@@ -1195,6 +1177,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar alerta ao abrir a página
     carregarAlerta();
 });
+
+
 // ===== DEVOLVER ALERTA =====
 
 async function devolverAlerta() {
@@ -1527,51 +1511,6 @@ function renderizarDestinatarios(destinatarios) {
 }
 
 // Renderizar setores na lista
-function renderizarSetores(setores) {
-    const container = document.getElementById('listaSetores');
-    if (!setores || setores.length === 0) {
-        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum setor cadastrado</span>';
-        return;
-    }
-    
-    container.innerHTML = setores.map((s, i) => `
-        <span class="setor-item" data-nome="${s.nome}" data-email="${s.email}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
-            ${s.nome} (${s.email})
-            <button class="btn-remover-setor" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
-        </span>
-    `).join('');
-    
-    document.querySelectorAll('.btn-remover-setor').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index);
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"setores":[]}');
-            if (config.setores) {
-                config.setores.splice(index, 1);
-                localStorage.setItem('config_informe', JSON.stringify(config));
-                renderizarSetores(config.setores);
-                popularSelectSetores(config.setores);
-                showAlert('Setor removido!', 'info');
-            }
-        });
-    });
-}
-
-// Popular o select de setores
-function popularSelectSetores(setores) {
-    const select = document.getElementById('setorResponsavel');
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">Selecione o setor...</option>';
-    if (setores) {
-        setores.forEach(s => {
-            const option = document.createElement('option');
-            option.value = s.nome;
-            option.textContent = s.nome;
-            option.dataset.email = s.email;
-            select.appendChild(option);
-        });
-    }
-}
 
 function showAlert(message, type = 'success') {
     const container = document.getElementById('alertContainer');
