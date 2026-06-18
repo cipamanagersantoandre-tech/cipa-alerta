@@ -679,6 +679,10 @@
     display: none;
 }
 
+#modalDestinatarios.active {
+    display: flex !important;
+}
+
     </style>
 </head>
 <body>
@@ -696,20 +700,22 @@
     </div>
 
     <!-- Lado direito: Botões -->
-    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn-topo" id="btnSalvarRascunho" style="background: #6b7280; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-            💾 Salvar Rascunho
-        </button>
-        <button class="btn-topo" id="btnEnviarSetor" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-            📤 Enviar para o Setor
-        </button>
-        <button class="btn-topo" id="btnDevolverAlerta" style="background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-            📤 Devolver Alerta
-        </button>
-        <button class="btn-topo" id="btnImprimirTopo" style="background: #1e466e; color: white; border: 2px solid white; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-            🖨️ Imprimir
-        </button>
-    </div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <button class="btn-topo" id="btnSalvarRascunho" style="background: #6b7280; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+        💾 Salvar Rascunho
+    </button>
+    <button class="btn-topo" id="btnEnviarSetor" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+        📤 Enviar para o Setor
+    </button>
+    <button class="btn-topo" id="btnDevolverAlerta" style="background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+        📤 Devolver Alerta
+    </button>
+    <button class="btn-topo" id="btnImprimirTopo" style="background: #1e466e; color: white; border: 2px solid white; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+        🖨️ Imprimir
+    </button>
+    <button class="btn-topo" id="btnGerenciarDestinatarios" style="background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+        📋 Gerenciar Destinatários
+    </button>
 </div>
 
 <!-- PAINEL DE CONFIGURAÇÕES (NÃO IMPRIME) -->
@@ -733,23 +739,33 @@
             <small style="color: #6b7280;">Nome que vai aparecer no email</small>
         </div>
 
-        <!-- GERENCIAR LISTA DE DESTINATÁRIOS -->
-        <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px;">📋 Gerenciar Lista de Destinatários:</label>
-            
-            <!-- Formulário para adicionar à lista -->
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 10px;">
-                <input type="text" id="novoDestinatarioNome" placeholder="Nome (ex: Produção)" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <input type="text" id="novoDestinatarioEmail" placeholder="Email" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <button id="btnAdicionarDestinatario" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar à Lista</button>
-            </div>
-            
-            <!-- Lista de destinatários cadastrados -->
-            <div id="listaDestinatarios" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-        </div>
-
         <div style="margin-top: 10px;">
             <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">💾 Salvar Configurações</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL GERENCIAR DESTINATÁRIOS -->
+<div id="modalDestinatarios" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: white; border-radius: 8px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #1e466e;">📋 Gerenciar Lista de Destinatários</h3>
+            <button id="btnFecharModalDestinatarios" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280;">×</button>
+        </div>
+
+        <!-- Formulário para adicionar -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 15px;">
+            <input type="text" id="novoDestinatarioNome" placeholder="Nome (ex: Produção)" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <input type="text" id="novoDestinatarioEmail" placeholder="Email" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <button id="btnAdicionarDestinatarioModal" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
+        </div>
+
+        <!-- Lista -->
+        <div id="listaDestinatariosModal" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #ddd; padding-top: 15px;">
+            <button id="btnFecharModalDestinatarios2" style="background: #6b7280; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">Fechar</button>
+            <button id="btnSalvarDestinatarios" style="background: #16a34a; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer;">💾 Salvar Lista</button>
         </div>
     </div>
 </div>
@@ -1196,6 +1212,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar configurações
     carregarConfiguracoes();
 
+    // ===== GERENCIAR DESTINATÁRIOS (MODAL) =====
+    
+    // Botão na barra superior
+    const btnGerenciar = document.getElementById('btnGerenciarDestinatarios');
+    if (btnGerenciar) {
+        btnGerenciar.addEventListener('click', abrirModalDestinatarios);
+    }
+    
+    // Fechar modal (X)
+    const btnFechar = document.getElementById('btnFecharModalDestinatarios');
+    if (btnFechar) {
+        btnFechar.addEventListener('click', fecharModalDestinatarios);
+    }
+    
+    // Fechar modal (botão Fechar)
+    const btnFechar2 = document.getElementById('btnFecharModalDestinatarios2');
+    if (btnFechar2) {
+        btnFechar2.addEventListener('click', fecharModalDestinatarios);
+    }
+    
+    // Adicionar destinatário no modal
+    const btnAdicionarModal = document.getElementById('btnAdicionarDestinatarioModal');
+    if (btnAdicionarModal) {
+        btnAdicionarModal.addEventListener('click', salvarDestinatariosModal);
+    }
+    
+    // Salvar lista (fecha o modal)
+    const btnSalvarLista = document.getElementById('btnSalvarDestinatarios');
+    if (btnSalvarLista) {
+        btnSalvarLista.addEventListener('click', function() {
+            fecharModalDestinatarios();
+            showAlert('✅ Lista salva!', 'success');
+        });
+    }
+
     // Carregar alerta ao abrir a página
     carregarAlerta();
 });
@@ -1538,6 +1589,91 @@ function popularSelectDestinatarios(destinatarios) {
             select.appendChild(option);
         });
     }
+}
+
+// ===== GERENCIAR DESTINATÁRIOS (MODAL) =====
+
+function abrirModalDestinatarios() {
+    const modal = document.getElementById('modalDestinatarios');
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    carregarListaDestinatariosModal();
+}
+
+function fecharModalDestinatarios() {
+    const modal = document.getElementById('modalDestinatarios');
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+}
+
+function carregarListaDestinatariosModal() {
+    const container = document.getElementById('listaDestinatariosModal');
+    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+    const destinatarios = config.destinatarios || [];
+    
+    if (destinatarios.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum destinatário cadastrado</span>';
+        return;
+    }
+    
+    container.innerHTML = destinatarios.map((d, i) => `
+        <span class="destinatario-item-modal" data-index="${i}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+            👤 ${d.nome} → ${d.email}
+            <button class="btn-remover-destinatario-modal" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
+        </span>
+    `).join('');
+    
+    document.querySelectorAll('.btn-remover-destinatario-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+            if (config.destinatarios) {
+                config.destinatarios.splice(index, 1);
+                localStorage.setItem('config_informe', JSON.stringify(config));
+                carregarListaDestinatariosModal();
+                popularSelectDestinatarios(config.destinatarios);
+                renderizarDestinatarios(config.destinatarios);
+                showAlert('Destinatário removido!', 'info');
+            }
+        });
+    });
+}
+
+function salvarDestinatariosModal() {
+    const nome = document.getElementById('novoDestinatarioNome').value.trim();
+    const email = document.getElementById('novoDestinatarioEmail').value.trim();
+    
+    if (!nome) {
+        showAlert('❌ Digite o nome do destinatário!', 'error');
+        return;
+    }
+    if (!email) {
+        showAlert('❌ Digite o email do destinatário!', 'error');
+        return;
+    }
+    if (!email.includes('@')) {
+        showAlert('❌ Email inválido!', 'error');
+        return;
+    }
+    
+    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+    if (!config.destinatarios) config.destinatarios = [];
+    
+    if (config.destinatarios.some(d => d.email === email)) {
+        showAlert('❌ Este email já está cadastrado!', 'error');
+        return;
+    }
+    
+    config.destinatarios.push({ nome, email });
+    localStorage.setItem('config_informe', JSON.stringify(config));
+    
+    document.getElementById('novoDestinatarioNome').value = '';
+    document.getElementById('novoDestinatarioEmail').value = '';
+    
+    carregarListaDestinatariosModal();
+    popularSelectDestinatarios(config.destinatarios);
+    renderizarDestinatarios(config.destinatarios);
+    showAlert('✅ Destinatário adicionado!', 'success');
 }
 
 // Renderizar setores na lista
