@@ -719,27 +719,34 @@
         <button id="btnToggleConfig" style="background: #1e466e; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">▼ Mostrar</button>
     </div>
     <div id="configContent" style="display: none; margin-top: 10px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email da CIPA (retorno):</label>
-                <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-            </div>
-            <div>
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setor Responsável:</label>
-                <select id="setorResponsavel" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-                    <option value="">Selecione o setor...</option>
-                </select>
-            </div>
+        <!-- Email da CIPA -->
+        <div style="margin-bottom: 10px;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">📧 Email da CIPA (retorno):</label>
+            <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+            <small style="color: #6b7280;">Separe múltiplos emails por vírgula</small>
         </div>
-        <div style="margin-top: 10px;">
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
-            <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <input type="text" id="novoSetorEmail" placeholder="Email do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 4px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
+
+        <!-- Nome do Responsável -->
+        <div style="margin-bottom: 10px;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">👤 Nome do Responsável (CIPA):</label>
+            <input type="text" id="nomeResponsavel" placeholder="João Silva - CIPA" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+            <small style="color: #6b7280;">Nome que vai aparecer no email</small>
+        </div>
+
+        <!-- Lista de Destinatários -->
+        <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 8px;">📋 Destinatários Cadastrados:</label>
+            <div id="listaDestinatarios" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;"></div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="novoDestinatarioNome" placeholder="Nome do setor/pessoa" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <input type="text" id="novoDestinatarioEmail" placeholder="Email" style="padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <button id="btnAdicionarDestinatario" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
             </div>
-            <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
+            <small style="color: #6b7280;">Exemplo: "Produção" + "producao@empresa.com"</small>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">💾 Salvar Configurações</button>
         </div>
     </div>
 </div>
@@ -1120,49 +1127,69 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Botão adicionar setor
-    const btnAdicionar = document.getElementById('btnAdicionarSetor');
-    if (btnAdicionar) {
-        btnAdicionar.addEventListener('click', function() {
-            const nome = document.getElementById('novoSetorNome').value.trim();
-            const email = document.getElementById('novoSetorEmail').value.trim();
-            
-            if (!nome) {
-                showAlert('❌ Digite o nome do setor!', 'error');
-                return;
+    // ===== CONFIGURAÇÕES =====
+    
+    // Toggle do painel
+    const btnToggle = document.getElementById('btnToggleConfig');
+    const configContent = document.getElementById('configContent');
+    if (btnToggle && configContent) {
+        btnToggle.addEventListener('click', function() {
+            if (configContent.style.display === 'none') {
+                configContent.style.display = 'block';
+                btnToggle.textContent = '▲ Ocultar';
+            } else {
+                configContent.style.display = 'none';
+                btnToggle.textContent = '▼ Mostrar';
             }
-            if (!email) {
-                showAlert('❌ Digite o email do setor!', 'error');
-                return;
-            }
-            
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"setores":[]}');
-            if (!config.setores) config.setores = [];
-            
-            if (config.setores.some(s => s.nome === nome)) {
-                showAlert('❌ Este setor já está cadastrado!', 'error');
-                return;
-            }
-            
-            config.setores.push({ nome, email });
-            localStorage.setItem('config_informe', JSON.stringify(config));
-            
-            document.getElementById('novoSetorNome').value = '';
-            document.getElementById('novoSetorEmail').value = '';
-            
-            renderizarSetores(config.setores);
-            popularSelectSetores(config.setores);
-            showAlert('✅ Setor adicionado!', 'success');
         });
     }
     
-    // Botão salvar configurações
+    // Adicionar destinatário
+    const btnAdicionar = document.getElementById('btnAdicionarDestinatario');
+    if (btnAdicionar) {
+        btnAdicionar.addEventListener('click', function() {
+            const nome = document.getElementById('novoDestinatarioNome').value.trim();
+            const email = document.getElementById('novoDestinatarioEmail').value.trim();
+            
+            if (!nome) {
+                showAlert('❌ Digite o nome do destinatário!', 'error');
+                return;
+            }
+            if (!email) {
+                showAlert('❌ Digite o email do destinatário!', 'error');
+                return;
+            }
+            if (!email.includes('@')) {
+                showAlert('❌ Email inválido!', 'error');
+                return;
+            }
+            
+            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+            if (!config.destinatarios) config.destinatarios = [];
+            
+            if (config.destinatarios.some(d => d.email === email)) {
+                showAlert('❌ Este email já está cadastrado!', 'error');
+                return;
+            }
+            
+            config.destinatarios.push({ nome, email });
+            localStorage.setItem('config_informe', JSON.stringify(config));
+            
+            document.getElementById('novoDestinatarioNome').value = '';
+            document.getElementById('novoDestinatarioEmail').value = '';
+            
+            renderizarDestinatarios(config.destinatarios);
+            showAlert('✅ Destinatário adicionado!', 'success');
+        });
+    }
+    
+    // Salvar configurações
     const btnSalvarConfig = document.getElementById('btnSalvarConfig');
     if (btnSalvarConfig) {
         btnSalvarConfig.addEventListener('click', salvarConfiguracoes);
     }
     
-    // Carregar configurações ao iniciar
+    // Carregar configurações
     carregarConfiguracoes();
 
     // Carregar alerta ao abrir a página
@@ -1316,7 +1343,6 @@ async function salvarRascunho() {
 async function enviarParaSetor() {
     const alertaId = document.getElementById('alertaId').value;
     
-    // Se não tiver ID, gerar um novo
     if (!alertaId) {
         const novoId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
         document.getElementById('alertaId').value = novoId;
@@ -1325,7 +1351,6 @@ async function enviarParaSetor() {
     
     const idAtual = document.getElementById('alertaId').value;
     
-    // Validar campos mínimos
     const titulo = document.getElementById('tituloAlerta').value.trim();
     const oque = document.getElementById('oqueAconteceu').value.trim();
     
@@ -1334,7 +1359,42 @@ async function enviarParaSetor() {
         return;
     }
     
-    // Coletar dados
+    const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+    const destinatarios = config.destinatarios || [];
+    
+    let mensagem = '📧 Digite o email do destinatário:\n\n';
+    if (destinatarios.length > 0) {
+        mensagem += '📋 Destinatários cadastrados:\n';
+        destinatarios.forEach((d, i) => {
+            mensagem += (i+1) + '. ' + d.nome + ' → ' + d.email + '\n';
+        });
+        mensagem += '\n💡 Digite o número da lista ou digite um email novo.';
+    } else {
+        mensagem += '💡 Nenhum destinatário cadastrado. Digite um email.';
+    }
+    
+    const resposta = prompt(mensagem);
+    if (!resposta) {
+        showAlert('❌ Envio cancelado', 'info');
+        return;
+    }
+    
+    let emailDestino = resposta.trim();
+    let nomeDestino = '';
+    
+    const numero = parseInt(resposta);
+    if (!isNaN(numero) && numero >= 1 && numero <= destinatarios.length) {
+        const selecionado = destinatarios[numero - 1];
+        emailDestino = selecionado.email;
+        nomeDestino = selecionado.nome;
+    }
+    
+    if (!emailDestino.includes('@')) {
+        showAlert('❌ Email inválido!', 'error');
+        return;
+    }
+    
+    const nomeResponsavel = document.getElementById('nomeResponsavel').value.trim() || 'CIPA';
     const dados = {
         titulo: titulo,
         ocorrencia: document.getElementById('ocorrencia').value.trim(),
@@ -1346,46 +1406,24 @@ async function enviarParaSetor() {
         prevencao1: document.getElementById('prevencao1').value.trim(),
         prevencao2: document.getElementById('prevencao2').value.trim(),
         prevencao3: document.getElementById('prevencao3').value.trim(),
-        elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
+        elaboradoPor: nomeResponsavel,
         dataAlerta: document.getElementById('dataAlerta').value,
         unidade: document.getElementById('unidadeAlerta').value.trim(),
+        emailDestino: emailDestino,
+        nomeDestino: nomeDestino || emailDestino,
         status: 'Enviado',
         dataEnvio: new Date().toISOString()
     };
     
     try {
-        // 1. Salvar na planilha
-        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
-        if (resultado.status !== 'sucesso') {
-            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
-            return;
-        }
-        
+        await salvarAlertaNaPlanilha(idAtual, dados);
         atualizarStatus('Enviado');
         showAlert('✅ Alerta salvo!', 'success');
         
-        // 2. Perguntar o email de destino
-        const emailDestino = prompt(
-            '📧 Digite o email do destinatário (coordenador do setor):\n\n' +
-            'Exemplo: coordenador@empresa.com'
-        );
-        
-        if (!emailDestino) {
-            showAlert('❌ Envio cancelado - email não informado', 'info');
-            return;
-        }
-        
-        if (!emailDestino.includes('@')) {
-            showAlert('❌ Email inválido!', 'error');
-            return;
-        }
-        
-        // 3. Enviar email
         const assunto = `🚨 Alerta de Segurança - ${dados.titulo}`;
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
-        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'CIPA';
         
-        const corpo = `Prezado(a) Coordenador(a),
+        const corpo = `Prezado(a) ${dados.nomeDestino},
 
 A CIPA registrou um alerta de segurança que requer sua análise.
 
@@ -1395,7 +1433,7 @@ A CIPA registrou um alerta de segurança que requer sua análise.
 🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
 🔹 Local: ${dados.local || 'Não informado'}
 
-📋 Descrição do ocorrido:
+📋 Descrição:
 ${dados.oqueAconteceu}
 
 ${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
@@ -1411,13 +1449,8 @@ Instruções:
 Atenciosamente,
 ${nomeResponsavel}`;
 
-        const emailResultado = await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
-        
-        if (emailResultado.status === 'sucesso') {
-            showAlert(`📧 Email enviado para ${emailDestino}!`, 'success');
-        } else {
-            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
-        }
+        await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
+        showAlert(`📧 Email enviado para ${dados.nomeDestino} (${emailDestino})!`, 'success');
         
     } catch (error) {
         console.error('Erro:', error);
@@ -1430,16 +1463,16 @@ ${nomeResponsavel}`;
 // ===== CONFIGURAÇÕES DE SETORES =====
 
 // Carregar configurações do localStorage
+// ===== CONFIGURAÇÕES =====
+
 function carregarConfiguracoes() {
     try {
         const config = JSON.parse(localStorage.getItem('config_informe'));
         if (config) {
-            if (config.emailCIPA) {
-                document.getElementById('emailCIPA').value = config.emailCIPA;
-            }
-            if (config.setores) {
-                renderizarSetores(config.setores);
-                popularSelectSetores(config.setores);
+            if (config.emailCIPA) document.getElementById('emailCIPA').value = config.emailCIPA;
+            if (config.nomeResponsavel) document.getElementById('nomeResponsavel').value = config.nomeResponsavel;
+            if (config.destinatarios) {
+                renderizarDestinatarios(config.destinatarios);
             }
         }
     } catch (e) {
@@ -1447,23 +1480,50 @@ function carregarConfiguracoes() {
     }
 }
 
-// Salvar configurações no localStorage
 function salvarConfiguracoes() {
-    const setores = [];
-    document.querySelectorAll('#listaSetores .setor-item').forEach(el => {
+    const destinatarios = [];
+    document.querySelectorAll('#listaDestinatarios .destinatario-item').forEach(el => {
         const nome = el.dataset.nome;
         const email = el.dataset.email;
-        if (nome) setores.push({ nome, email });
+        if (nome && email) destinatarios.push({ nome, email });
     });
     
     const config = {
         emailCIPA: document.getElementById('emailCIPA').value.trim(),
-        setores: setores
+        nomeResponsavel: document.getElementById('nomeResponsavel').value.trim(),
+        destinatarios: destinatarios
     };
     
     localStorage.setItem('config_informe', JSON.stringify(config));
-    popularSelectSetores(setores);
     showAlert('✅ Configurações salvas!', 'success');
+}
+
+function renderizarDestinatarios(destinatarios) {
+    const container = document.getElementById('listaDestinatarios');
+    if (!destinatarios || destinatarios.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum destinatário cadastrado</span>';
+        return;
+    }
+    
+    container.innerHTML = destinatarios.map((d, i) => `
+        <span class="destinatario-item" data-nome="${d.nome}" data-email="${d.email}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+            👤 ${d.nome} (${d.email})
+            <button class="btn-remover-destinatario" data-index="${i}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
+        </span>
+    `).join('');
+    
+    document.querySelectorAll('.btn-remover-destinatario').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.dataset.index);
+            const config = JSON.parse(localStorage.getItem('config_informe') || '{"destinatarios":[]}');
+            if (config.destinatarios) {
+                config.destinatarios.splice(index, 1);
+                localStorage.setItem('config_informe', JSON.stringify(config));
+                renderizarDestinatarios(config.destinatarios);
+                showAlert('Destinatário removido!', 'info');
+            }
+        });
+    });
 }
 
 // Renderizar setores na lista
