@@ -1168,6 +1168,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar alerta ao abrir a página
     carregarAlerta();
 });
+// ===== DEVOLVER ALERTA =====
+
 async function devolverAlerta() {
     const alertaId = document.getElementById('alertaId').value;
     
@@ -1184,11 +1186,11 @@ async function devolverAlerta() {
     const prevencao1 = document.getElementById('prevencao1').value.trim();
     
     if (!titulo || !oque || !porque || !licao || !prevencao1) {
-        showAlert('❌ Preencha: Título, O que aconteceu, Por que aconteceu, Lição aprendida e pelo menos 1 prevenção!', 'error');
+        showAlert('❌ Preencha todos os campos obrigatórios:\n- Título\n- O que aconteceu\n- Por que aconteceu\n- Lição aprendida\n- Pelo menos 1 prevenção', 'error');
         return;
     }
     
-    // Coletar dados
+    // Coletar dados completos
     const dados = {
         titulo: titulo,
         ocorrencia: document.getElementById('ocorrencia').value.trim(),
@@ -1207,34 +1209,53 @@ async function devolverAlerta() {
         dataResposta: new Date().toISOString()
     };
     
-    // Salvar na planilha
     try {
-        await salvarAlertaNaPlanilha(alertaId, dados);
+        // 1. Salvar na planilha
+        const resultado = await salvarAlertaNaPlanilha(alertaId, dados);
+        if (resultado.status !== 'sucesso') {
+            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
+            return;
+        }
+        
         atualizarStatus('Respondido');
         showAlert('✅ Alerta salvo e devolvido!', 'success');
         
-        // Enviar email para a CIPA
-        const emailCIPA = document.getElementById('emailCIPA')?.value || 'cipa@empresa.com';
+        // 2. Enviar email para a CIPA (email de retorno)
+        const emailCIPA = document.getElementById('emailCIPA').value.trim() || 'cipa@empresa.com';
+        
         const assunto = `✅ Alerta de Segurança Respondido - ${alertaId}`;
+        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'Setor Responsável';
+        
         const corpo = `Prezada CIPA,
 
-O alerta de segurança foi analisado e respondido.
+O alerta de segurança foi analisado e respondido pelo setor responsável.
 
 🔹 Alerta: ${dados.titulo}
+🔹 ID: ${alertaId}
 🔹 Unidade: ${dados.unidade || 'Não informada'}
-🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
+🔹 Data do Alerta: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
 🔹 Data da Resposta: ${new Date().toLocaleString('pt-BR')}
 
-📋 Resumo:
+📋 Resumo da Resposta:
 - O que aconteceu: ${dados.oqueAconteceu}
 - Por que aconteceu: ${dados.porqueAconteceu}
 - Lição aprendida: ${dados.licaoAprendida}
 
-Atenciosamente,
-Setor Responsável`;
+🛡️ Medidas de Prevenção:
+1. ${dados.prevencao1}
+${dados.prevencao2 ? '2. ' + dados.prevencao2 : ''}
+${dados.prevencao3 ? '3. ' + dados.prevencao3 : ''}
 
-        await enviarEmailViaScript(emailCIPA, assunto, corpo, alertaId);
-        showAlert('📧 Email enviado para a CIPA!', 'success');
+Atenciosamente,
+${nomeResponsavel}`;
+
+        const emailResultado = await enviarEmailViaScript(emailCIPA, assunto, corpo, alertaId);
+        
+        if (emailResultado.status === 'sucesso') {
+            showAlert(`📧 Email enviado para ${emailCIPA}!`, 'success');
+        } else {
+            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
+        }
         
     } catch (error) {
         console.error('Erro:', error);
@@ -1247,12 +1268,17 @@ Setor Responsável`;
 async function salvarRascunho() {
     const alertaId = document.getElementById('alertaId').value;
     
+    // Se não tiver ID, gerar um novo
     if (!alertaId) {
-        showAlert('❌ ID do alerta não encontrado!', 'error');
-        return;
+        const novoId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
+        document.getElementById('alertaId').value = novoId;
+        document.getElementById('alertaIdDisplay').textContent = 'ID: ' + novoId;
+        showAlert('🆔 Novo ID gerado: ' + novoId, 'info');
     }
     
-    // Coletar dados
+    const idAtual = document.getElementById('alertaId').value;
+    
+    // Coletar dados do formulário
     const dados = {
         titulo: document.getElementById('tituloAlerta').value.trim(),
         ocorrencia: document.getElementById('ocorrencia').value.trim(),
@@ -1272,9 +1298,13 @@ async function salvarRascunho() {
     };
     
     try {
-        await salvarAlertaNaPlanilha(alertaId, dados);
-        atualizarStatus('Rascunho');
-        showAlert('✅ Rascunho salvo!', 'success');
+        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
+        if (resultado.status === 'sucesso') {
+            atualizarStatus('Rascunho');
+            showAlert('✅ Rascunho salvo com sucesso! ID: ' + idAtual, 'success');
+        } else {
+            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
+        }
     } catch (error) {
         console.error('Erro:', error);
         showAlert('❌ Erro ao salvar rascunho', 'error');
@@ -1286,10 +1316,14 @@ async function salvarRascunho() {
 async function enviarParaSetor() {
     const alertaId = document.getElementById('alertaId').value;
     
+    // Se não tiver ID, gerar um novo
     if (!alertaId) {
-        showAlert('❌ ID do alerta não encontrado!', 'error');
-        return;
+        const novoId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
+        document.getElementById('alertaId').value = novoId;
+        document.getElementById('alertaIdDisplay').textContent = 'ID: ' + novoId;
     }
+    
+    const idAtual = document.getElementById('alertaId').value;
     
     // Validar campos mínimos
     const titulo = document.getElementById('tituloAlerta').value.trim();
@@ -1297,21 +1331,6 @@ async function enviarParaSetor() {
     
     if (!titulo || !oque) {
         showAlert('❌ Preencha pelo menos Título e O que aconteceu!', 'error');
-        return;
-    }
-    
-    // Verificar se um setor foi selecionado
-    const setorSelect = document.getElementById('setorResponsavel');
-    const setorNome = setorSelect.value;
-    const setorEmail = setorSelect.options[setorSelect.selectedIndex]?.dataset?.email || '';
-    
-    if (!setorNome) {
-        showAlert('❌ Selecione um setor responsável nas configurações!', 'error');
-        return;
-    }
-    
-    if (!setorEmail) {
-        showAlert('❌ O setor selecionado não tem email cadastrado!', 'error');
         return;
     }
     
@@ -1330,28 +1349,53 @@ async function enviarParaSetor() {
         elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
         dataAlerta: document.getElementById('dataAlerta').value,
         unidade: document.getElementById('unidadeAlerta').value.trim(),
-        setorResponsavel: setorNome,
         status: 'Enviado',
         dataEnvio: new Date().toISOString()
     };
     
     try {
-        await salvarAlertaNaPlanilha(alertaId, dados);
+        // 1. Salvar na planilha
+        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
+        if (resultado.status !== 'sucesso') {
+            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
+            return;
+        }
+        
         atualizarStatus('Enviado');
         showAlert('✅ Alerta salvo!', 'success');
         
+        // 2. Perguntar o email de destino
+        const emailDestino = prompt(
+            '📧 Digite o email do destinatário (coordenador do setor):\n\n' +
+            'Exemplo: coordenador@empresa.com'
+        );
+        
+        if (!emailDestino) {
+            showAlert('❌ Envio cancelado - email não informado', 'info');
+            return;
+        }
+        
+        if (!emailDestino.includes('@')) {
+            showAlert('❌ Email inválido!', 'error');
+            return;
+        }
+        
+        // 3. Enviar email
         const assunto = `🚨 Alerta de Segurança - ${dados.titulo}`;
-        const link = window.location.href;
-        const corpo = `Prezado(a) Coordenador(a) do Setor ${setorNome},
+        const link = window.location.href.split('?')[0] + '?id=' + idAtual;
+        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'CIPA';
+        
+        const corpo = `Prezado(a) Coordenador(a),
 
 A CIPA registrou um alerta de segurança que requer sua análise.
 
+📋 Enviado por: ${nomeResponsavel}
 🔹 Alerta: ${dados.titulo}
 🔹 Unidade: ${dados.unidade || 'Não informada'}
 🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
 🔹 Local: ${dados.local || 'Não informado'}
 
-📋 Descrição:
+📋 Descrição do ocorrido:
 ${dados.oqueAconteceu}
 
 ${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
@@ -1365,10 +1409,15 @@ Instruções:
 3. Clique em "Devolver Alerta" quando concluir
 
 Atenciosamente,
-CIPA`;
+${nomeResponsavel}`;
 
-        await enviarEmailViaScript(setorEmail, assunto, corpo, alertaId);
-        showAlert(`📧 Email enviado para o setor ${setorNome}!`, 'success');
+        const emailResultado = await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
+        
+        if (emailResultado.status === 'sucesso') {
+            showAlert(`📧 Email enviado para ${emailDestino}!`, 'success');
+        } else {
+            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
+        }
         
     } catch (error) {
         console.error('Erro:', error);
