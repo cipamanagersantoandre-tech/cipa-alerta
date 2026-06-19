@@ -715,49 +715,6 @@
 </div>
 </div>
 
-<!-- PAINEL DE CONFIGURAÇÕES (NÃO IMPRIME) -->
-<div id="painelConfig" style="background: #f0f2f5; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #d0d7de;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h4 style="margin: 0; color: #1e466e;">⚙️ Configurações de Envio</h4>
-        <button id="btnToggleConfig" style="background: #1e466e; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">▼ Mostrar</button>
-    </div>
-    <div id="configContent" style="display: none; margin-top: 10px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email de retorno:</label>
-<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-    <select id="selectEmailCIPA" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-        <option value="">-- Selecione um email cadastrado --</option>
-    </select>
-    <span style="color: #6b7280; font-size: 13px;">ou</span>
-    <input type="text" id="emailCIPA" placeholder="Digite um email manualmente" style="flex: 2; min-width: 200px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-</div>
-<small style="color: #6b7280; font-size: 11px;">Escolha um email da lista ou digite manualmente</small>
-            </div>
-            <div>
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setor Responsável:</label>
-                <select id="setorResponsavel" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-                    <option value="">Selecione o setor...</option>
-                </select>
-            </div>
-        </div>
-<div style="margin-top: 10px;">
-    <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
-    <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-        <select id="selectSetorExistente" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-            <option value="">-- Selecione um setor existente --</option>
-        </select>
-        <span style="color: #6b7280; font-size: 13px;">ou</span>
-        <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" style="flex: 1; min-width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-        <input type="text" id="novoSetorEmail_antigo" placeholder="Email do setor" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-        <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
-    </div>
-    <small style="color: #6b7280; font-size: 11px;">Selecione um setor da lista para preencher os campos, ou digite manualmente</small>
-    <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
-</div>
-    </div>
-</div>
 
 <!-- PAINEL DE CONFIGURAÇÕES DE SETORES E EMAILS (NÃO IMPRIME) -->
 <div id="painelSetores" style="display: none; background: #f0f2f5; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #d0d7de;">
