@@ -1476,7 +1476,7 @@ async function enviarAlertaParaSetor() {
         elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
         dataAlerta: document.getElementById('dataAlerta').value,
         unidade: document.getElementById('unidadeAlerta').value.trim(),
-        status: 'Enviado',
+        status: 'Respondido',
         dataEnvio: new Date().toISOString()
     };
     
@@ -1634,11 +1634,11 @@ if (btnEnviar) {
     btnEnviar.addEventListener('click', abrirModalEnvio);
 }
 
-    // Botão Devolver Alerta (barra superior)
-    const btnDevolverTopo = document.getElementById('btnDevolverAlerta');
-    if (btnDevolverTopo) {
-        btnDevolverTopo.addEventListener('click', devolverAlerta);
-    }
+// Botão Devolver Alerta (barra superior) - ABRE O MODAL DE ENVIO
+const btnDevolverTopo = document.getElementById('btnDevolverAlerta');
+if (btnDevolverTopo) {
+    btnDevolverTopo.addEventListener('click', abrirModalEnvio);
+}
 
     // Botão Imprimir da barra superior
     const btnImprimirTopo = document.getElementById('btnImprimirTopo');
@@ -1648,11 +1648,12 @@ if (btnEnviar) {
         });
     }
 
-    // Botão Devolver Alerta da parte inferior (se existir)
-    const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
-    if (btnDevolverInferior) {
-        btnDevolverInferior.addEventListener('click', devolverAlerta);
-    }
+// Botão Devolver Alerta da parte inferior - ABRE O MODAL DE ENVIO
+const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
+if (btnDevolverInferior) {
+    btnDevolverInferior.addEventListener('click', abrirModalEnvio);
+}
+
 
     // Botão Imprimir da parte inferior
     const btnImprimirInferior = document.getElementById('btnImprimir');
