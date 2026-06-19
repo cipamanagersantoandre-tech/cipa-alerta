@@ -737,6 +737,42 @@
         <div id="listaSetoresConfig" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
     </div>
 </div>
+
+<!-- MODAL DE ENVIO PARA O SETOR (NÃO IMPRIME) -->
+<div id="modalEnviarSetor" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: white; border-radius: 8px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        
+        <!-- Cabeçalho do Modal -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem;">
+            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;">📤 Enviar Alerta para o Setor</h2>
+            <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
+        </div>
+
+        <!-- Select de Setores -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Setor destinatário:</label>
+            <select id="selectSetorEnvio" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                <option value="">-- Selecione um setor --</option>
+            </select>
+        </div>
+
+        <!-- Lista de Destinatários -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Destinatários:</label>
+            <div id="listaDestinatarios" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; min-height: 70px; max-height: 200px; overflow-y: auto; background: #f9fafb;">
+                <span style="color: #6b7280; font-size: 13px;">Selecione um setor ou adicione manualmente</span>
+            </div>
+            <button onclick="adicionarDestinatarioManual()" style="margin-top: 8px; background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;">+ Adicionar destinatário</button>
+        </div>
+
+        <!-- Botões -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+            <button onclick="fecharModalEnviar()" style="background: #6c757d; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancelar</button>
+            <button id="btnConfirmarEnvio" style="background: #2563eb; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">📤 Enviar Agora</button>
+        </div>
+    </div>
+</div>
+
     <!-- CABEÇALHO -->
     <table class="tabela-cabecalho">
         <tr>
@@ -1300,6 +1336,223 @@ function atualizarStatus(status) {
     document.getElementById('statusTexto').textContent = statusMap[status] || '📝 Rascunho';
 }
 
+// ================================================================
+// ===== FUNÇÕES PARA O MODAL DE ENVIO =====
+// ================================================================
+
+// Variável global para armazenar os destinatários
+let destinatarios = [];
+
+// ===== ABRIR MODAL DE ENVIO =====
+function abrirModalEnvio() {
+    const modal = document.getElementById('modalEnviarSetor');
+    modal.style.display = 'flex';
+    
+    // Carregar setores no select
+    carregarSetoresEnvio();
+    
+    // Limpar lista de destinatários
+    destinatarios = [];
+    atualizarListaDestinatarios();
+}
+
+// ===== FECHAR MODAL DE ENVIO =====
+function fecharModalEnviar() {
+    document.getElementById('modalEnviarSetor').style.display = 'none';
+}
+
+// ===== CARREGAR SETORES NO SELECT DE ENVIO =====
+async function carregarSetoresEnvio() {
+    try {
+        const select = document.getElementById('selectSetorEnvio');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Selecione um setor --</option>';
+        
+        const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=setores&_=${Date.now()}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.status === 'sucesso' && result.dados) {
+            result.dados.forEach(item => {
+                try {
+                    const dados = JSON.parse(item.dados);
+                    if (dados && dados.nome && dados.nome.trim()) {
+                        const option = document.createElement('option');
+                        option.value = dados.email || '';
+                        option.textContent = dados.nome + (dados.email ? ` (${dados.email})` : '');
+                        option.dataset.nome = dados.nome;
+                        option.dataset.email = dados.email || '';
+                        select.appendChild(option);
+                    }
+                } catch (e) {
+                    // Ignora itens inválidos
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar setores:', error);
+    }
+}
+
+// ===== QUANDO SELECIONAR UM SETOR, PREENCHE OS DESTINATÁRIOS =====
+// Esta função será chamada dentro do DOMContentLoaded
+
+// ===== ADICIONAR DESTINATÁRIO MANUALMENTE =====
+function adicionarDestinatarioManual() {
+    const email = prompt('Digite o email do destinatário:');
+    if (email && email.trim()) {
+        if (!email.includes('@')) {
+            alert('❌ Email inválido! Digite um email válido (ex: nome@empresa.com).');
+            return;
+        }
+        const nome = prompt('Digite o nome do destinatário (opcional - deixe em branco se não quiser):') || '';
+        destinatarios.push({ email: email.trim(), nome: nome.trim() });
+        atualizarListaDestinatarios();
+    }
+}
+
+// ===== ATUALIZAR LISTA DE DESTINATÁRIOS NA TELA =====
+function atualizarListaDestinatarios() {
+    const container = document.getElementById('listaDestinatarios');
+    if (!container) return;
+    
+    if (destinatarios.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Selecione um setor ou clique em "+ Adicionar destinatário"</span>';
+        return;
+    }
+    
+    container.innerHTML = destinatarios.map((d, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #dbeafe; border-radius: 4px; margin-bottom: 4px;">
+            <span style="font-size: 14px;">${d.nome ? d.nome + ' - ' : ''}<strong>${d.email}</strong></span>
+            <button onclick="removerDestinatario(${i})" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 4px;">✕</button>
+        </div>
+    `).join('');
+}
+
+// ===== REMOVER DESTINATÁRIO =====
+function removerDestinatario(index) {
+    destinatarios.splice(index, 1);
+    atualizarListaDestinatarios();
+}
+
+// ===== ENVIAR ALERTA PARA OS DESTINATÁRIOS =====
+async function enviarAlertaParaSetor() {
+    // Validar se tem destinatários
+    if (destinatarios.length === 0) {
+        showAlert('❌ Adicione pelo menos um destinatário!', 'error');
+        return;
+    }
+    
+    // Verificar se o alerta tem título
+    const titulo = document.getElementById('tituloAlerta').value.trim();
+    if (!titulo) {
+        showAlert('❌ Preencha o Título do Alerta antes de enviar!', 'error');
+        return;
+    }
+    
+    // Gerar ID se não tiver
+    let alertaId = document.getElementById('alertaId').value;
+    if (!alertaId) {
+        alertaId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
+        document.getElementById('alertaId').value = alertaId;
+        document.getElementById('alertaIdDisplay').textContent = 'ID: ' + alertaId;
+    }
+    
+    const idAtual = document.getElementById('alertaId').value;
+    
+    // Coletar dados do formulário
+    const dados = {
+        titulo: titulo,
+        ocorrencia: document.getElementById('ocorrencia').value.trim(),
+        local: document.getElementById('local').value.trim(),
+        publico: document.getElementById('publico').value.trim(),
+        oqueAconteceu: document.getElementById('oqueAconteceu').value.trim(),
+        porqueAconteceu: document.getElementById('porqueAconteceu').value.trim(),
+        licaoAprendida: document.getElementById('licaoAprendida').value.trim(),
+        prevencao1: document.getElementById('prevencao1').value.trim(),
+        prevencao2: document.getElementById('prevencao2').value.trim(),
+        prevencao3: document.getElementById('prevencao3').value.trim(),
+        elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
+        dataAlerta: document.getElementById('dataAlerta').value,
+        unidade: document.getElementById('unidadeAlerta').value.trim(),
+        status: 'Enviado',
+        dataEnvio: new Date().toISOString()
+    };
+    
+    // Mostrar carregamento
+    const btnEnviar = document.getElementById('btnConfirmarEnvio');
+    const textoOriginal = btnEnviar.textContent;
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = '⏳ Enviando...';
+    
+    try {
+        // 1. Salvar na planilha
+        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
+        if (resultado.status !== 'sucesso') {
+            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = textoOriginal;
+            return;
+        }
+        
+        atualizarStatus('Enviado');
+        
+        // 2. Enviar email para todos os destinatários
+        const emails = destinatarios.map(d => d.email).join(',');
+        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'CIPA';
+        const assunto = `🚨 Alerta de Segurança - ${dados.titulo}`;
+        const link = window.location.href.split('?')[0] + '?id=' + idAtual;
+        
+        // Lista de nomes para o corpo do email
+        const listaNomes = destinatarios.map(d => `${d.nome || 'Responsável'} (${d.email})`).join('\n');
+        
+        const corpo = `Prezados(as),
+
+A CIPA registrou um alerta de segurança que requer sua análise.
+
+📋 Enviado por: ${nomeResponsavel}
+🔹 Alerta: ${dados.titulo}
+🔹 Unidade: ${dados.unidade || 'Não informada'}
+🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
+🔹 Local: ${dados.local || 'Não informado'}
+
+📋 Descrição do ocorrido:
+${dados.oqueAconteceu}
+
+${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
+
+📋 Destinatários deste alerta:
+${listaNomes}
+
+🔗 Para analisar e preencher o alerta, acesse o link abaixo:
+${link}
+
+Instruções:
+1. Clique no link acima
+2. Preencha os campos: "Por que aconteceu?", "Lição Aprendida" e "Prevenção"
+3. Clique em "Devolver Alerta" quando concluir
+
+Atenciosamente,
+${nomeResponsavel}`;
+
+        const emailResultado = await enviarEmailViaScript(emails, assunto, corpo, idAtual);
+        
+        if (emailResultado.status === 'sucesso') {
+            showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`, 'success');
+            fecharModalEnviar();
+        } else {
+            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
+        }
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        showAlert('❌ Erro ao enviar para o setor', 'error');
+    } finally {
+        btnEnviar.disabled = false;
+        btnEnviar.textContent = textoOriginal;
+    }
+}
 
 // ===== BOTÃO DEVOLVER ALERTA =====
 
@@ -1309,6 +1562,41 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarEmailsCIPA();
     carregarSetoresSelect();
 
+// ===== QUANDO SELECIONAR UM SETOR NO MODAL, PREENCHE OS DESTINATÁRIOS =====
+const selectSetorEnvio = document.getElementById('selectSetorEnvio');
+if (selectSetorEnvio) {
+    selectSetorEnvio.addEventListener('change', function() {
+        const email = this.value;
+        const nome = this.options[this.selectedIndex]?.dataset?.nome || '';
+        
+        if (email && email.trim()) {
+            // Se já tiver destinatários, pergunta se quer substituir
+            if (destinatarios.length > 0) {
+                if (!confirm('Substituir a lista de destinatários pelos emails deste setor?')) {
+                    this.value = '';
+                    return;
+                }
+            }
+            
+            // Adicionar os emails do setor
+            destinatarios = [];
+            
+            // Verifica se tem vários emails separados por vírgula
+            const emails = email.split(',').map(e => e.trim()).filter(e => e);
+            emails.forEach(e => {
+                destinatarios.push({ email: e, nome: nome });
+            });
+            
+            atualizarListaDestinatarios();
+        }
+    });
+}
+
+// ===== BOTÃO CONFIRMAR ENVIO DO MODAL =====
+const btnConfirmarEnvio = document.getElementById('btnConfirmarEnvio');
+if (btnConfirmarEnvio) {
+    btnConfirmarEnvio.addEventListener('click', enviarAlertaParaSetor);
+}
 
 // ===== QUANDO SELECIONAR UM SETOR, PREENCHE OS CAMPOS =====
 const selectSetor = document.getElementById('selectSetorExistente');
@@ -1339,11 +1627,11 @@ if (selectSetor && inputNomeSetor && inputEmailSetor) {
         btnSalvar.addEventListener('click', salvarRascunho);
     }
 
-    // Botão Enviar para o Setor
-    const btnEnviar = document.getElementById('btnEnviarSetor');
-    if (btnEnviar) {
-        btnEnviar.addEventListener('click', enviarParaSetor);
-    }
+// Botão Enviar para o Setor (abre o modal)
+const btnEnviar = document.getElementById('btnEnviarSetor');
+if (btnEnviar) {
+    btnEnviar.addEventListener('click', abrirModalEnvio);
+}
 
     // Botão Devolver Alerta (barra superior)
     const btnDevolverTopo = document.getElementById('btnDevolverAlerta');
@@ -1567,120 +1855,6 @@ async function salvarRascunho() {
     } catch (error) {
         console.error('Erro:', error);
         showAlert('❌ Erro ao salvar rascunho', 'error');
-    }
-}
-
-// ===== ENVIAR PARA O SETOR =====
-
-async function enviarParaSetor() {
-    const alertaId = document.getElementById('alertaId').value;
-    
-    // Se não tiver ID, gerar um novo
-    if (!alertaId) {
-        const novoId = 'ALERTA-' + Date.now().toString(36).toUpperCase();
-        document.getElementById('alertaId').value = novoId;
-        document.getElementById('alertaIdDisplay').textContent = 'ID: ' + novoId;
-    }
-    
-    const idAtual = document.getElementById('alertaId').value;
-    
-    // Validar campos mínimos
-    const titulo = document.getElementById('tituloAlerta').value.trim();
-    const oque = document.getElementById('oqueAconteceu').value.trim();
-    
-    if (!titulo || !oque) {
-        showAlert('❌ Preencha pelo menos Título e O que aconteceu!', 'error');
-        return;
-    }
-    
-    // Coletar dados
-    const dados = {
-        titulo: titulo,
-        ocorrencia: document.getElementById('ocorrencia').value.trim(),
-        local: document.getElementById('local').value.trim(),
-        publico: document.getElementById('publico').value.trim(),
-        oqueAconteceu: oque,
-        porqueAconteceu: document.getElementById('porqueAconteceu').value.trim(),
-        licaoAprendida: document.getElementById('licaoAprendida').value.trim(),
-        prevencao1: document.getElementById('prevencao1').value.trim(),
-        prevencao2: document.getElementById('prevencao2').value.trim(),
-        prevencao3: document.getElementById('prevencao3').value.trim(),
-        elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
-        dataAlerta: document.getElementById('dataAlerta').value,
-        unidade: document.getElementById('unidadeAlerta').value.trim(),
-        status: 'Enviado',
-        dataEnvio: new Date().toISOString()
-    };
-    
-    try {
-        // 1. Salvar na planilha
-        const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
-        if (resultado.status !== 'sucesso') {
-            showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
-            return;
-        }
-        
-        atualizarStatus('Enviado');
-        showAlert('✅ Alerta salvo!', 'success');
-        
-        // 2. Perguntar o email de destino
-        const emailDestino = prompt(
-            '📧 Digite o email do destinatário (coordenador do setor):\n\n' +
-            'Exemplo: coordenador@empresa.com'
-        );
-        
-        if (!emailDestino) {
-            showAlert('❌ Envio cancelado - email não informado', 'info');
-            return;
-        }
-        
-        if (!emailDestino.includes('@')) {
-            showAlert('❌ Email inválido!', 'error');
-            return;
-        }
-        
-        // 3. Enviar email
-        const assunto = `🚨 Alerta de Segurança - ${dados.titulo}`;
-        const link = window.location.href.split('?')[0] + '?id=' + idAtual;
-        const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'CIPA';
-        
-        const corpo = `Prezado(a) Coordenador(a),
-
-A CIPA registrou um alerta de segurança que requer sua análise.
-
-📋 Enviado por: ${nomeResponsavel}
-🔹 Alerta: ${dados.titulo}
-🔹 Unidade: ${dados.unidade || 'Não informada'}
-🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
-🔹 Local: ${dados.local || 'Não informado'}
-
-📋 Descrição do ocorrido:
-${dados.oqueAconteceu}
-
-${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
-
-🔗 Para analisar e preencher o alerta, acesse o link abaixo:
-${link}
-
-Instruções:
-1. Clique no link acima
-2. Preencha os campos: "Por que aconteceu?", "Lição Aprendida" e "Prevenção"
-3. Clique em "Devolver Alerta" quando concluir
-
-Atenciosamente,
-${nomeResponsavel}`;
-
-        const emailResultado = await enviarEmailViaScript(emailDestino, assunto, corpo, idAtual);
-        
-        if (emailResultado.status === 'sucesso') {
-            showAlert(`📧 Email enviado para ${emailDestino}!`, 'success');
-        } else {
-            showAlert('⚠️ Alerta salvo, mas erro ao enviar email: ' + emailResultado.mensagem, 'error');
-        }
-        
-    } catch (error) {
-        console.error('Erro:', error);
-        showAlert('❌ Erro ao enviar para o setor', 'error');
     }
 }
 
