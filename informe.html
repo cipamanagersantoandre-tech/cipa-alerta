@@ -744,7 +744,7 @@
         
         <!-- Cabeçalho do Modal -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem;">
-            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;">📤 Enviar Alerta para o Setor</h2>
+            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;" id="tituloModalEnvio">📤 Enviar Alerta para o Setor</h2>
             <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
         </div>
 
@@ -1344,9 +1344,23 @@ function atualizarStatus(status) {
 let destinatarios = [];
 
 // ===== ABRIR MODAL DE ENVIO =====
-function abrirModalEnvio() {
+function abrirModalEnvio(tipo) {
     const modal = document.getElementById('modalEnviarSetor');
     modal.style.display = 'flex';
+    
+    // Mudar título e cor do botão conforme o tipo
+    const titulo = document.getElementById('tituloModalEnvio');
+    const btnEnviar = document.getElementById('btnConfirmarEnvio');
+    
+    if (tipo === 'devolver') {
+        titulo.textContent = '📤 Devolver Alerta';
+        btnEnviar.style.background = '#c55a11';
+        btnEnviar.textContent = '📤 Devolver Agora';
+    } else {
+        titulo.textContent = '📤 Enviar Alerta para o Setor';
+        btnEnviar.style.background = '#2563eb';
+        btnEnviar.textContent = '📤 Enviar Agora';
+    }
     
     // Carregar setores no select
     carregarSetoresEnvio();
@@ -1476,7 +1490,7 @@ async function enviarAlertaParaSetor() {
         elaboradoPor: document.getElementById('elaboradoPor').value.trim(),
         dataAlerta: document.getElementById('dataAlerta').value,
         unidade: document.getElementById('unidadeAlerta').value.trim(),
-        status: 'Respondido',
+        status: document.getElementById('tituloModalEnvio').textContent.includes('Devolver') ? 'Respondido' : 'Enviado',
         dataEnvio: new Date().toISOString()
     };
     
@@ -1631,13 +1645,17 @@ if (selectSetor && inputNomeSetor && inputEmailSetor) {
 // Botão Enviar para o Setor (abre o modal)
 const btnEnviar = document.getElementById('btnEnviarSetor');
 if (btnEnviar) {
-    btnEnviar.addEventListener('click', abrirModalEnvio);
+    btnEnviar.addEventListener('click', function() {
+        abrirModalEnvio('enviar');
+    });
 }
 
-// Botão Devolver Alerta (barra superior) - ABRE O MODAL DE ENVIO
+// Botão Devolver Alerta (barra superior)
 const btnDevolverTopo = document.getElementById('btnDevolverAlerta');
 if (btnDevolverTopo) {
-    btnDevolverTopo.addEventListener('click', abrirModalEnvio);
+    btnDevolverTopo.addEventListener('click', function() {
+        abrirModalEnvio('devolver');
+    });
 }
 
     // Botão Imprimir da barra superior
@@ -1648,12 +1666,13 @@ if (btnDevolverTopo) {
         });
     }
 
-// Botão Devolver Alerta da parte inferior - ABRE O MODAL DE ENVIO
+// Botão Devolver Alerta da parte inferior
 const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
 if (btnDevolverInferior) {
-    btnDevolverInferior.addEventListener('click', abrirModalEnvio);
+    btnDevolverInferior.addEventListener('click', function() {
+        abrirModalEnvio('devolver');
+    });
 }
-
 
     // Botão Imprimir da parte inferior
     const btnImprimirInferior = document.getElementById('btnImprimir');
