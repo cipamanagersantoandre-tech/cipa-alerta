@@ -743,6 +743,25 @@
         </div>
 <div style="margin-top: 10px;">
     <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
+    
+    <!-- Lista de setores já cadastrados -->
+    <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;"></div>
+    
+    <!-- Select para escolher setor existente (sozinho em cima) -->
+    <select id="selectSetorExistente" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;">
+        <option value="">-- Selecione um setor existente --</option>
+    </select>
+    
+    <!-- Campos para preencher manualmente -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch;">
+        <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" style="flex: 1; min-width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+        <textarea id="novoSetorEmail_antigo" placeholder="Digite os emails, um por linha" style="flex: 2; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; min-height: 60px;"></textarea>
+        <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 6px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; align-self: flex-end; height: 40px;">+ Adicionar</button>
+    </div>
+    <small style="color: #6b7280; font-size: 11px;">Selecione um setor da lista para preencher os campos, ou digite manualmente</small>
+    
+    <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
+</div>
     <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
         <select id="selectSetorExistente" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
