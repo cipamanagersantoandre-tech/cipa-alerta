@@ -725,7 +725,13 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div>
                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email da CIPA (retorno):</label>
-                <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <select id="emailCIPA" style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="">Selecione um e-mail...</option>
+                    </select>
+                    <input type="text" id="emailCIPA_custom" placeholder="Ou digite outro e-mail" style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <small style="color: #6b7280; font-size: 11px;">Escolha um e-mail da lista ou digite um novo.</small>
             </div>
             <div>
                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setor Responsável:</label>
@@ -736,14 +742,13 @@
         </div>
         <div style="margin-top: 10px;">
             <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
-            <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <input type="text" id="novoSetorEmail_antigo" placeholder="Email do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 4px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
-            </div>
-            <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
+            <select id="listaSetores" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="">Selecione um setor...</option>
+            </select>
+            <small style="color: #6b7280; font-size: 11px;">Você pode escolher um setor para visualizar ou reutilizar.</small>
         </div>
+        <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 12px;">💾 Salvar Configurações</button>
+    </div>
     </div>
 </div>
 
@@ -1004,7 +1009,6 @@ async function carregarAlerta() {
 // Função para carregar os setores da planilha
 async function carregarSetores() {
     try {
-        // Tenta carregar da planilha
         const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=setores`;
         const response = await fetch(url);
         const result = await response.json();
@@ -1019,13 +1023,53 @@ async function carregarSetores() {
                 .filter(item => item !== null);
         }
         
+        preencherSelectSetores(setores);
+        preencherSelectEmail(setores);
+        preencherSelectListaSetores(setores);
         renderizarSetoresConfig(setores);
-        popularSelectSetores(setores);
+        
         return setores;
     } catch (e) {
         console.error('Erro ao carregar setores:', e);
         return [];
     }
+}
+
+function preencherSelectSetores(setores) {
+    const select = document.getElementById('setorResponsavel');
+    if (!select) return;
+    select.innerHTML = '<option value="">Selecione o setor...</option>';
+    setores.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.nome;
+        option.textContent = s.nome;
+        select.appendChild(option);
+    });
+}
+
+function preencherSelectEmail(setores) {
+    const select = document.getElementById('emailCIPA');
+    if (!select) return;
+    select.innerHTML = '<option value="">Selecione um e-mail...</option>';
+    const emails = [...new Set(setores.map(s => s.email).filter(Boolean))];
+    emails.forEach(email => {
+        const option = document.createElement('option');
+        option.value = email;
+        option.textContent = email;
+        select.appendChild(option);
+    });
+}
+
+function preencherSelectListaSetores(setores) {
+    const select = document.getElementById('listaSetores');
+    if (!select) return;
+    select.innerHTML = '<option value="">Selecione um setor...</option>';
+    setores.forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.nome;
+        option.textContent = `${s.nome} (${s.email})`;
+        select.appendChild(option);
+    });
 }
 
 // Função para renderizar a lista de setores no painel NOVO
@@ -1300,20 +1344,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-// Botão adicionar setor (versão corrigida - salva na nuvem)
-const btnAdicionar = document.getElementById('btnAdicionarSetor');
-if (btnAdicionar) {
-    btnAdicionar.addEventListener('click', function() {
-        const nome = document.getElementById('novoSetorNome_antigo').value.trim();
-        const email = document.getElementById('novoSetorEmail_antigo').value.trim();
-        
-        if (!nome) { showAlert('❌ Digite o nome do setor!', 'error'); return; }
-        if (!email) { showAlert('❌ Digite o email do setor!', 'error'); return; }
-        
-        // Chama a função que salva na nuvem
-        adicionarSetorConfig();
-    });
-}
     
     // Botão salvar configurações
     const btnSalvarConfig = document.getElementById('btnSalvarConfig');
@@ -1626,7 +1656,13 @@ function carregarConfiguracoes() {
         const config = JSON.parse(localStorage.getItem('config_informe'));
         if (config) {
             if (config.emailCIPA) {
-                document.getElementById('emailCIPA').value = config.emailCIPA;
+                const select = document.getElementById('emailCIPA');
+                const optionExists = Array.from(select.options).some(opt => opt.value === config.emailCIPA);
+                if (optionExists) {
+                    select.value = config.emailCIPA;
+                } else {
+                    document.getElementById('emailCIPA_custom').value = config.emailCIPA;
+                }
             }
         }
     } catch (e) {
@@ -1636,9 +1672,12 @@ function carregarConfiguracoes() {
 
 // Salvar configurações no localStorage
 function salvarConfiguracoes() {
+    const selectEmail = document.getElementById('emailCIPA').value;
+    const inputEmail = document.getElementById('emailCIPA_custom').value.trim();
+    const emailCIPA = inputEmail || selectEmail;
+    
     const config = {
-        emailCIPA: document.getElementById('emailCIPA').value.trim()
-        // Os setores agora são salvos na nuvem, não mais no localStorage
+        emailCIPA: emailCIPA
     };
     
     localStorage.setItem('config_informe', JSON.stringify(config));
