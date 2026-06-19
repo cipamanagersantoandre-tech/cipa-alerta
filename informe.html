@@ -1562,33 +1562,34 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarEmailsCIPA();
     carregarSetoresSelect();
 
-// ===== QUANDO SELECIONAR UM SETOR NO MODAL, PREENCHE OS DESTINATÁRIOS =====
+// ===== QUANDO SELECIONAR UM SETOR NO MODAL, ADICIONA OS EMAILS =====
 const selectSetorEnvio = document.getElementById('selectSetorEnvio');
 if (selectSetorEnvio) {
     selectSetorEnvio.addEventListener('change', function() {
         const email = this.value;
         const nome = this.options[this.selectedIndex]?.dataset?.nome || '';
         
-        if (email && email.trim()) {
-            // Se já tiver destinatários, pergunta se quer substituir
-            if (destinatarios.length > 0) {
-                if (!confirm('Substituir a lista de destinatários pelos emails deste setor?')) {
-                    this.value = '';
-                    return;
-                }
-            }
-            
-            // Adicionar os emails do setor
-            destinatarios = [];
-            
-            // Verifica se tem vários emails separados por vírgula
-            const emails = email.split(',').map(e => e.trim()).filter(e => e);
-            emails.forEach(e => {
-                destinatarios.push({ email: e, nome: nome });
-            });
-            
-            atualizarListaDestinatarios();
+        if (!email || !email.trim()) {
+            return;
         }
+        
+        const novosEmails = email.split(',').map(e => e.trim()).filter(e => e);
+        let adicionados = 0;
+        novosEmails.forEach(e => {
+            if (!destinatarios.some(d => d.email === e)) {
+                destinatarios.push({ email: e, nome: nome });
+                adicionados++;
+            }
+        });
+        
+        if (adicionados > 0) {
+            showAlert(`✅ ${adicionados} email(s) adicionado(s) à lista!`, 'success');
+        } else {
+            showAlert('ℹ️ Todos os emails já estavam na lista!', 'info');
+        }
+        
+        atualizarListaDestinatarios();
+        this.value = '';
     });
 }
 
