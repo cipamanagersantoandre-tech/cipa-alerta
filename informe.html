@@ -1569,14 +1569,58 @@ if (selectSetorEnvio) {
         const email = this.value;
         const nome = this.options[this.selectedIndex]?.dataset?.nome || '';
         
-        if (email && email.trim()) {
-            // Se já tiver destinatários, pergunta se quer substituir
-            if (destinatarios.length > 0) {
-                if (!confirm('Substituir a lista de destinatários pelos emails deste setor?')) {
-                    this.value = '';
-                    return;
+        if (!email || !email.trim()) {
+            return;
+        }
+        
+        // Pega os emails do setor (pode ter vários separados por vírgula)
+        const novosEmails = email.split(',').map(e => e.trim()).filter(e => e);
+        
+        // Se não tiver destinatários, apenas adiciona
+        if (destinatarios.length === 0) {
+            novosEmails.forEach(e => {
+                destinatarios.push({ email: e, nome: nome });
+            });
+            atualizarListaDestinatarios();
+            return;
+        }
+        
+        // Se já tiver destinatários, pergunta o que fazer
+        const acao = confirm(
+            '📋 Já existem destinatários na lista.\n\n' +
+            'Clique em "OK" → ADICIONAR os emails deste setor\n' +
+            'Clique em "Cancelar" → SUBSTITUIR a lista atual\n\n' +
+            `Setor selecionado: ${nome || 'Sem nome'} (${novosEmails.length} email${novosEmails.length > 1 ? 's' : ''})`
+        );
+        
+        if (acao) {
+            // ===== OPÇÃO ADICIONAR =====
+            // Mantém os existentes e acrescenta os novos (sem duplicatas)
+            let adicionados = 0;
+            novosEmails.forEach(e => {
+                if (!destinatarios.some(d => d.email === e)) {
+                    destinatarios.push({ email: e, nome: nome });
+                    adicionados++;
                 }
+            });
+            
+            if (adicionados === 0) {
+                showAlert('ℹ️ Todos os emails já estavam na lista!', 'info');
+            } else {
+                showAlert(`✅ ${adicionados} email(s) adicionado(s) à lista!`, 'success');
             }
+        } else {
+            // ===== OPÇÃO SUBSTITUIR =====
+            destinatarios = [];
+            novosEmails.forEach(e => {
+                destinatarios.push({ email: e, nome: nome });
+            });
+            showAlert(`🔄 Lista substituída por ${novosEmails.length} email(s) do setor`, 'info');
+        }
+        
+        atualizarListaDestinatarios();
+    });
+}
             
             // Adicionar os emails do setor
             destinatarios = [];
