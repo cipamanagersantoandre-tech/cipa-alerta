@@ -716,11 +716,6 @@
 </div>
 
 <!-- PAINEL DE CONFIGURAÇÕES (NÃO IMPRIME) -->
-<div id="painelConfig" style="background: #f0f2f5; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #d0d7de;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h4 style="margin: 0; color: #1e466e;">⚙️ Configurações de Envio</h4>
-        <button id="btnToggleConfig" style="background: #1e466e; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">▼ Mostrar</button>
-    </div>
     <div id="configContent" style="display: none; margin-top: 10px;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
             <div>
@@ -1343,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+   
     
     // Botão salvar configurações
     const btnSalvarConfig = document.getElementById('btnSalvarConfig');
