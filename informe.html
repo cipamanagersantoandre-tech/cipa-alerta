@@ -748,13 +748,13 @@
             <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
         </div>
 
-        <!-- Select de Setores -->
-        <div style="margin-bottom: 1rem;">
-            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Setor destinatário:</label>
-            <select id="selectSetorEnvio" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
-                <option value="">-- Selecione um setor --</option>
-            </select>
-        </div>
+<!-- Select de Setores com botão Adicionar -->
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
+    <select id="selectSetorEnvio" style="flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+        <option value="">-- Selecione um setor --</option>
+    </select>
+    <button id="btnAdicionarDestinatario" style="background: #1e466e; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap;">+ Adicionar à lista</button>
+</div>
 
         <!-- Lista de Destinatários -->
         <div style="margin-bottom: 1rem;">
@@ -1412,6 +1412,43 @@ function adicionarDestinatarioManual() {
     }
 }
 
+// ===== QUANDO SELECIONAR UM SETOR, GUARDA O EMAIL SELECIONADO =====
+let emailSelecionado = '';
+let nomeSelecionado = '';
+
+// ===== BOTÃO ADICIONAR DESTINATÁRIO =====
+const btnAdicionarDestinatario = document.getElementById('btnAdicionarDestinatario');
+if (btnAdicionarDestinatario) {
+    btnAdicionarDestinatario.addEventListener('click', function() {
+        if (!emailSelecionado || !emailSelecionado.trim()) {
+            showAlert('❌ Selecione um setor primeiro!', 'error');
+            return;
+        }
+        
+        const novosEmails = emailSelecionado.split(',').map(e => e.trim()).filter(e => e);
+        let adicionados = 0;
+        novosEmails.forEach(e => {
+            if (!destinatarios.some(d => d.email === e)) {
+                destinatarios.push({ email: e, nome: nomeSelecionado });
+                adicionados++;
+            }
+        });
+        
+        if (adicionados > 0) {
+            showAlert(`✅ ${adicionados} email(s) adicionado(s) à lista!`, 'success');
+        } else {
+            showAlert('ℹ️ Todos os emails já estavam na lista!', 'info');
+        }
+        
+        atualizarListaDestinatarios();
+        
+        // Limpa o select
+        document.getElementById('selectSetorEnvio').value = '';
+        emailSelecionado = '';
+        nomeSelecionado = '';
+    });
+}
+
 // ===== ATUALIZAR LISTA DE DESTINATÁRIOS NA TELA =====
 function atualizarListaDestinatarios() {
     const container = document.getElementById('listaDestinatarios');
@@ -1562,34 +1599,16 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarEmailsCIPA();
     carregarSetoresSelect();
 
-// ===== QUANDO SELECIONAR UM SETOR NO MODAL, ADICIONA OS EMAILS =====
+// ===== QUANDO SELECIONAR UM SETOR, GUARDA O EMAIL =====
 const selectSetorEnvio = document.getElementById('selectSetorEnvio');
 if (selectSetorEnvio) {
     selectSetorEnvio.addEventListener('change', function() {
-        const email = this.value;
-        const nome = this.options[this.selectedIndex]?.dataset?.nome || '';
+        emailSelecionado = this.value;
+        nomeSelecionado = this.options[this.selectedIndex]?.dataset?.nome || '';
         
-        if (!email || !email.trim()) {
-            return;
+        if (emailSelecionado && emailSelecionado.trim()) {
+            showAlert(`📌 Setor selecionado: ${nomeSelecionado || 'Sem nome'}`, 'info');
         }
-        
-        const novosEmails = email.split(',').map(e => e.trim()).filter(e => e);
-        let adicionados = 0;
-        novosEmails.forEach(e => {
-            if (!destinatarios.some(d => d.email === e)) {
-                destinatarios.push({ email: e, nome: nome });
-                adicionados++;
-            }
-        });
-        
-        if (adicionados > 0) {
-            showAlert(`✅ ${adicionados} email(s) adicionado(s) à lista!`, 'success');
-        } else {
-            showAlert('ℹ️ Todos os emails já estavam na lista!', 'info');
-        }
-        
-        atualizarListaDestinatarios();
-        this.value = '';
     });
 }
 
