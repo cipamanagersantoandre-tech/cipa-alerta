@@ -1276,41 +1276,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Botão adicionar setor
-    const btnAdicionar = document.getElementById('btnAdicionarSetor');
-    if (btnAdicionar) {
-        btnAdicionar.addEventListener('click', function() {
-            const nome = document.getElementById('novoSetorNome').value.trim();
-            const email = document.getElementById('novoSetorEmail').value.trim();
-            
-            if (!nome) {
-                showAlert('❌ Digite o nome do setor!', 'error');
-                return;
-            }
-            if (!email) {
-                showAlert('❌ Digite o email do setor!', 'error');
-                return;
-            }
-            
-            const config = JSON.parse(localStorage.getItem('config_informe') || '{"setores":[]}');
-            if (!config.setores) config.setores = [];
-            
-            if (config.setores.some(s => s.nome === nome)) {
-                showAlert('❌ Este setor já está cadastrado!', 'error');
-                return;
-            }
-            
-            config.setores.push({ nome, email });
-            localStorage.setItem('config_informe', JSON.stringify(config));
-            
-            document.getElementById('novoSetorNome').value = '';
-            document.getElementById('novoSetorEmail').value = '';
-            
-            renderizarSetores(config.setores);
-            popularSelectSetores(config.setores);
-            showAlert('✅ Setor adicionado!', 'success');
-        });
-    }
+// Botão adicionar setor (versão corrigida - salva na nuvem)
+const btnAdicionar = document.getElementById('btnAdicionarSetor');
+if (btnAdicionar) {
+    btnAdicionar.addEventListener('click', function() {
+        const nome = document.getElementById('novoSetorNome').value.trim();
+        const email = document.getElementById('novoSetorEmail').value.trim();
+        
+        if (!nome) { showAlert('❌ Digite o nome do setor!', 'error'); return; }
+        if (!email) { showAlert('❌ Digite o email do setor!', 'error'); return; }
+        
+        // Chama a função que salva na nuvem
+        adicionarSetorConfig();
+    });
+}
     
     // Botão salvar configurações
     const btnSalvarConfig = document.getElementById('btnSalvarConfig');
