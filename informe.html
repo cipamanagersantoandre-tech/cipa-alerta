@@ -1658,21 +1658,6 @@ if (btnDevolverTopo) {
     });
 }
 
-// ===== BOTÕES DE IMPRESSÃO =====
-function imprimirAlerta() {
-    window.print();
-}
-
-const btnImprimirTopo = document.getElementById('btnImprimirTopo');
-if (btnImprimirTopo) {
-    btnImprimirTopo.addEventListener('click', imprimirAlerta);
-}
-
-const btnImprimirInferior = document.getElementById('btnImprimir');
-if (btnImprimirInferior) {
-    btnImprimirInferior.addEventListener('click', imprimirAlerta);
-}
-
     // ===== CONFIGURAÇÕES =====
     
 // Botão adicionar setor (versão corrigida - salva na nuvem)
@@ -1726,7 +1711,21 @@ if (btnAdicionar) {
     
     // Carregar setores ao iniciar a página
     carregarSetores();
+// Carregar setores ao iniciar a página
+carregarSetores();
+
+// ===== BOTÕES DE IMPRESSÃO =====
+document.querySelectorAll('#btnImprimirTopo, #btnImprimir').forEach(function(botao) {
+    botao.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.print();
+    });
 });
+
+}); // <--- FIM DO DOMContentLoaded
+
+
 // ===== DEVOLVER ALERTA =====
 
 async function devolverAlerta() {
@@ -2038,7 +2037,17 @@ function popularSelectSetores(setores) {
             if(input.type === 'date') {
                 input.value = '';
             }
-        });
+// ===== BOTÕES DE IMPRESSÃO =====
+document.querySelectorAll('#btnImprimirTopo, #btnImprimir').forEach(function(botao) {
+    botao.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.print();
+    });
+});
+
+}); // <--- FIM DO DOMContentLoaded
+
 // Limpa as duas fotos
 const preview1 = document.getElementById('previewFoto1');
 const preview2 = document.getElementById('previewFoto2');
