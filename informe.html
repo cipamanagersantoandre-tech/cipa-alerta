@@ -1658,6 +1658,14 @@ if (btnDevolverTopo) {
     });
 }
 
+// Botão Devolver Alerta da parte inferior
+const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
+if (btnDevolverInferior) {
+    btnDevolverInferior.addEventListener('click', function() {
+        abrirModalEnvio('devolver');
+    });
+}
+
     // ===== CONFIGURAÇÕES =====
     
 // Botão adicionar setor (versão corrigida - salva na nuvem)
