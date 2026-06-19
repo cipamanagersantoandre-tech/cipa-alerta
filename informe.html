@@ -912,6 +912,20 @@
 
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 
+function showAlert(message, type = 'success') {
+    const container = document.getElementById('alertContainer');
+    if (!container) {
+        alert(message);
+        return;
+    }
+    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
+    container.appendChild(alert);
+    setTimeout(() => alert.remove(), 5000);
+}
+
 // ===== FUNÇÕES DE COMUNICAÇÃO COM A PLANILHA =====
 
 async function salvarAlertaNaPlanilha(id, dados) {
@@ -1666,20 +1680,6 @@ function popularSelectSetores(setores) {
             select.appendChild(option);
         });
     }
-}
-
-function showAlert(message, type = 'success') {
-    const container = document.getElementById('alertContainer');
-    if (!container) {
-        alert(message);
-        return;
-    }
-    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
-    container.appendChild(alert);
-    setTimeout(() => alert.remove(), 5000);
 }
 
 // ----- FOTO (ATÉ 2 FOTOS) -----
