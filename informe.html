@@ -723,10 +723,17 @@
     </div>
     <div id="configContent" style="display: none; margin-top: 10px;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div>
-                <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email da CIPA (retorno):</label>
-                <input type="text" id="emailCIPA" placeholder="cipa@empresa.com, outro@empresa.com" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-            </div>
+<div>
+    <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Email da CIPA (retorno):</label>
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <select id="selectEmailCIPA" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+            <option value="">-- Selecione um email cadastrado --</option>
+        </select>
+        <span style="color: #6b7280; font-size: 13px;">ou</span>
+        <input type="text" id="emailCIPA" placeholder="Digite um email manualmente" style="flex: 2; min-width: 200px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+    <small style="color: #6b7280; font-size: 11px;">Escolha um email da lista ou digite manualmente</small>
+</div>
             <div>
                 <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setor Responsável:</label>
                 <select id="setorResponsavel" style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
@@ -1930,6 +1937,80 @@ atualizarTextoPrint();
 
 // Executa uma vez ao carregar
 atualizarTextoPrint();
+
+// ===== CARREGAR EMAILS DA PLANILHA PARA O SELECT =====
+async function carregarEmailsCIPA() {
+    try {
+        const select = document.getElementById('selectEmailCIPA');
+        if (!select) return;
+        
+        // Buscar os setores/emails da planilha
+        const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=setores&_=${Date.now()}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        // Limpar opções (manter apenas a primeira)
+        select.innerHTML = '<option value="">-- Selecione um email cadastrado --</option>';
+        
+        if (result.status === 'sucesso' && result.dados) {
+            const emails = [];
+            
+            result.dados.forEach(item => {
+                try {
+                    const dados = JSON.parse(item.dados);
+                    if (dados && dados.email && dados.email.trim()) {
+                        emails.push(dados.email.trim());
+                    }
+                } catch (e) {
+                    // Ignora itens que não são JSON válido
+                }
+            });
+            
+            // Remover duplicatas
+            const emailsUnicos = [...new Set(emails)];
+            
+            // Ordenar alfabeticamente
+            emailsUnicos.sort();
+            
+            // Adicionar ao select
+            emailsUnicos.forEach(email => {
+                const option = document.createElement('option');
+                option.value = email;
+                option.textContent = email;
+                select.appendChild(option);
+            });
+            
+            // Se tiver emails, mostra quantos foram carregados
+            if (emailsUnicos.length > 0) {
+                console.log(`📧 ${emailsUnicos.length} emails carregados da planilha`);
+            } else {
+                console.log('📧 Nenhum email cadastrado na planilha');
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar emails:', error);
+        // Não mostra alerta para não incomodar o usuário
+    }
+}
+
+// ===== QUANDO SELECIONAR UM EMAIL, PREENCHE O CAMPO =====
+document.addEventListener('DOMContentLoaded', function() {
+    const selectEmail = document.getElementById('selectEmailCIPA');
+    const inputEmail = document.getElementById('emailCIPA');
+    
+    if (selectEmail && inputEmail) {
+        selectEmail.addEventListener('change', function() {
+            const valorSelecionado = this.value;
+            if (valorSelecionado) {
+                inputEmail.value = valorSelecionado;
+            }
+        });
+    }
+    
+    // CARREGAR OS EMAILS DA PLANILHA
+    carregarEmailsCIPA();
+});
+
 
 </script>
 </body>
