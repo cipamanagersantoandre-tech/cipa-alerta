@@ -750,7 +750,7 @@
         </select>
         <span style="color: #6b7280; font-size: 13px;">ou</span>
         <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" style="flex: 1; min-width: 120px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-        <input type="text" id="novoSetorEmail_antigo" placeholder="Email do setor" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+<textarea id="novoSetorEmail_antigo" placeholder="Digite os emails, um por linha" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; min-height: 60px; height: auto;"></textarea>
         <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
     </div>
     <small style="color: #6b7280; font-size: 11px;">Selecione um setor da lista para preencher os campos, ou digite manualmente</small>
@@ -770,7 +770,7 @@
         <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Adicionar Novo Setor</label>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-            <input type="email" id="novoSetorEmail" placeholder="E-mail do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+<textarea id="novoSetorEmail" placeholder="Digite os emails, um por linha" style="flex: 1; min-width: 150px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; min-height: 60px; height: auto;"></textarea>
             <button id="btnAdicionarSetorConfig" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
         </div>
     </div>
@@ -1082,7 +1082,10 @@ function popularSelectSetores(setores) {
 // Função para adicionar um novo setor
 async function adicionarSetorConfig() {
     const nome = document.getElementById('novoSetorNome').value.trim();
-    const email = document.getElementById('novoSetorEmail').value.trim();
+    // Pega os emails do textarea (um por linha) e converte para string separada por vírgula
+const emailRaw = document.getElementById('novoSetorEmail').value.trim();
+const emails = emailRaw.split('\n').map(e => e.trim()).filter(e => e);
+const email = emails.join(', ');
     
     if (!nome) {
         showAlert('❌ Digite o nome do setor!', 'error');
@@ -1377,7 +1380,13 @@ if (selectSetor && inputNomeSetor && inputEmailSetor) {
             try {
                 const dados = JSON.parse(valorSelecionado);
                 inputNomeSetor.value = dados.nome || '';
-                inputEmailSetor.value = dados.email || '';
+                // Se o email tiver vírgulas, transforma em linhas
+if (dados.email) {
+    const emails = dados.email.split(',').map(e => e.trim()).filter(e => e);
+    inputEmailSetor.value = emails.join('\n');
+} else {
+    inputEmailSetor.value = '';
+}
             } catch (e) {
                 // Se não for JSON válido, ignora
             }
@@ -1451,7 +1460,10 @@ const btnAdicionar = document.getElementById('btnAdicionarSetor');
 if (btnAdicionar) {
     btnAdicionar.addEventListener('click', function() {
         const nome = document.getElementById('novoSetorNome_antigo').value.trim();
-        const email = document.getElementById('novoSetorEmail_antigo').value.trim();
+        // Pega os emails do textarea (um por linha) e converte para string separada por vírgula
+const emailRaw = document.getElementById('novoSetorEmail_antigo').value.trim();
+const emails = emailRaw.split('\n').map(e => e.trim()).filter(e => e);
+const email = emails.join(', ');
         
         if (!nome) { showAlert('❌ Digite o nome do setor!', 'error'); return; }
         if (!email) { showAlert('❌ Digite o email do setor!', 'error'); return; }
