@@ -1595,7 +1595,6 @@ if (selectSetorEnvio) {
         
         if (acao) {
             // ===== OPÇÃO ADICIONAR =====
-            // Mantém os existentes e acrescenta os novos (sem duplicatas)
             let adicionados = 0;
             novosEmails.forEach(e => {
                 if (!destinatarios.some(d => d.email === e)) {
@@ -1619,20 +1618,6 @@ if (selectSetorEnvio) {
         }
         
         atualizarListaDestinatarios();
-    });
-}
-            
-            // Adicionar os emails do setor
-            destinatarios = [];
-            
-            // Verifica se tem vários emails separados por vírgula
-            const emails = email.split(',').map(e => e.trim()).filter(e => e);
-            emails.forEach(e => {
-                destinatarios.push({ email: e, nome: nome });
-            });
-            
-            atualizarListaDestinatarios();
-        }
     });
 }
 
