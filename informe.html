@@ -1658,20 +1658,19 @@ if (btnDevolverTopo) {
     });
 }
 
-    // Botão Imprimir da barra superior
-    const btnImprimirTopo = document.getElementById('btnImprimirTopo');
-    if (btnImprimirTopo) {
-        btnImprimirTopo.addEventListener('click', function() {
-            window.print();
-        });
-    }
+// ===== BOTÕES DE IMPRESSÃO =====
+function imprimirAlerta() {
+    window.print();
+}
 
-// Botão Devolver Alerta da parte inferior
-const btnDevolverInferior = document.querySelector('.botoes-acao #btnDevolverAlerta');
-if (btnDevolverInferior) {
-    btnDevolverInferior.addEventListener('click', function() {
-        abrirModalEnvio('devolver');
-    });
+const btnImprimirTopo = document.getElementById('btnImprimirTopo');
+if (btnImprimirTopo) {
+    btnImprimirTopo.addEventListener('click', imprimirAlerta);
+}
+
+const btnImprimirInferior = document.getElementById('btnImprimir');
+if (btnImprimirInferior) {
+    btnImprimirInferior.addEventListener('click', imprimirAlerta);
 }
 
     // Botão Imprimir da parte inferior
