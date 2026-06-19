@@ -738,8 +738,8 @@
             <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
             <div id="listaSetores" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
-                <input type="text" id="novoSetorEmail" placeholder="Email do setor" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" ...> style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+                <input type="text" id="novoSetorEmail_antigo" placeholder="Email do setor" ...> style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
                 <button id="btnAdicionarSetor" style="background: #1e466e; color: white; border: none; padding: 4px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
             </div>
             <button id="btnSalvarConfig" style="background: #16a34a; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; margin-top: 8px;">💾 Salvar Configurações</button>
@@ -757,7 +757,7 @@
     <div style="margin-top: 10px;">
         <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Adicionar Novo Setor</label>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <input type="text" id="novoSetorNome_antigo" placeholder="Nome do setor" ...> style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
             <input type="email" id="novoSetorEmail" placeholder="E-mail do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
             <button id="btnAdicionarSetorConfig" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
         </div>
@@ -1294,8 +1294,8 @@ document.addEventListener('DOMContentLoaded', function() {
 const btnAdicionar = document.getElementById('btnAdicionarSetor');
 if (btnAdicionar) {
     btnAdicionar.addEventListener('click', function() {
-        const nome = document.getElementById('novoSetorNome').value.trim();
-        const email = document.getElementById('novoSetorEmail').value.trim();
+        const nome = document.getElementById('novoSetorNome_antigo').value.trim();
+        const email = document.getElementById('novoSetorEmail_antigo').value.trim();
         
         if (!nome) { showAlert('❌ Digite o nome do setor!', 'error'); return; }
         if (!email) { showAlert('❌ Digite o email do setor!', 'error'); return; }
