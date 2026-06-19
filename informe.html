@@ -1081,6 +1081,12 @@ async function adicionarSetorConfig() {
         return;
     }
     
+    // Desabilitar o botão e mudar o texto
+    const botao = document.getElementById('btnAdicionarSetorConfig');
+    const textoOriginal = botao.textContent;
+    botao.disabled = true;
+    botao.textContent = '⏳ Adicionando...';
+    
     // Gerar um ID único
     const id = 'SETOR-' + Date.now().toString(36).toUpperCase();
     
@@ -1104,6 +1110,10 @@ async function adicionarSetorConfig() {
     } catch (e) {
         console.error('Erro ao adicionar setor:', e);
         showAlert('❌ Erro de conexão ao adicionar setor', 'error');
+    } finally {
+        // Reabilitar o botão e restaurar o texto original
+        botao.disabled = false;
+        botao.textContent = textoOriginal;
     }
 }
 
