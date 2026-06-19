@@ -919,11 +919,11 @@ function showAlert(message, type = 'success') {
         return;
     }
     const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
-    container.appendChild(alert);
-    setTimeout(() => alert.remove(), 5000);
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
+    container.appendChild(alertDiv);
+    setTimeout(() => alertDiv.remove(), 5000);
 }
 
 // ===== FUNÇÕES DE COMUNICAÇÃO COM A PLANILHA =====
