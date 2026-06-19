@@ -1309,18 +1309,6 @@ document.addEventListener('DOMContentLoaded', function() {
     carregarEmailsCIPA();
     carregarSetoresSelect();
 
-// ===== QUANDO SELECIONAR UM EMAIL, PREENCHE O CAMPO =====
-const selectEmail = document.getElementById('selectEmailCIPA');
-const inputEmail = document.getElementById('emailCIPA');
-
-if (selectEmail && inputEmail) {
-    selectEmail.addEventListener('change', function() {
-        const valorSelecionado = this.value;
-        if (valorSelecionado) {
-            inputEmail.value = valorSelecionado;
-        }
-    });
-}
 
 // ===== QUANDO SELECIONAR UM SETOR, PREENCHE OS CAMPOS =====
 const selectSetor = document.getElementById('selectSetorExistente');
@@ -1387,22 +1375,6 @@ if (selectSetor && inputNomeSetor && inputEmailSetor) {
 
     // ===== CONFIGURAÇÕES =====
     
-    // Toggle do painel de configuração
-    const btnToggle = document.getElementById('btnToggleConfig');
-    const configContent = document.getElementById('configContent');
-    
-    if (btnToggle && configContent) {
-        btnToggle.addEventListener('click', function() {
-            if (configContent.style.display === 'none') {
-                configContent.style.display = 'block';
-                btnToggle.textContent = '▲ Ocultar';
-            } else {
-                configContent.style.display = 'none';
-                btnToggle.textContent = '▼ Mostrar';
-            }
-        });
-    }
-    
 // Botão adicionar setor (versão corrigida - salva na nuvem)
 const btnAdicionar = document.getElementById('btnAdicionarSetor');
 if (btnAdicionar) {
@@ -1419,13 +1391,6 @@ if (btnAdicionar) {
 }
     
     // Botão salvar configurações
-    const btnSalvarConfig = document.getElementById('btnSalvarConfig');
-    if (btnSalvarConfig) {
-        btnSalvarConfig.addEventListener('click', salvarConfiguracoes);
-    }
-    
-    // Carregar configurações ao iniciar
-    carregarConfiguracoes();
 
     // Carregar alerta ao abrir a página
     carregarAlerta();
