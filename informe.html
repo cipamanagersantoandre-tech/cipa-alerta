@@ -699,6 +699,10 @@
 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
     <button class="btn-topo" id="btnSalvarRascunho" style="background: #6b7280; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
         💾 Salvar Rascunho
+<input type="text" id="inputCarregarRascunho" placeholder="Digite o ID do rascunho" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 180px; background: white; color: #333;">
+<button class="btn-topo" id="btnCarregarRascunho" style="background: #8b5cf6; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+    🔍 Carregar
+</button>
     </button>
     <button class="btn-topo" id="btnEnviarSetor" style="background: #2563eb; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
         📤 Enviar para o Setor
@@ -1642,6 +1646,22 @@ if (selectSetor && inputNomeSetor && inputEmailSetor) {
         btnSalvar.addEventListener('click', salvarRascunho);
     }
 
+// Botão Carregar Rascunho
+const btnCarregar = document.getElementById('btnCarregarRascunho');
+if (btnCarregar) {
+    btnCarregar.addEventListener('click', carregarRascunho);
+}
+
+// Tecla Enter no campo de ID
+const inputCarregar = document.getElementById('inputCarregarRascunho');
+if (inputCarregar) {
+    inputCarregar.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            carregarRascunho();
+        }
+    });
+}
+
 // Botão Enviar para o Setor (abre o modal)
 const btnEnviar = document.getElementById('btnEnviarSetor');
 if (btnEnviar) {
@@ -1867,13 +1887,55 @@ async function salvarRascunho() {
         const resultado = await salvarAlertaNaPlanilha(idAtual, dados);
         if (resultado.status === 'sucesso') {
             atualizarStatus('Rascunho');
-            showAlert('✅ Rascunho salvo com sucesso! ID: ' + idAtual, 'success');
+            showAlert('✅ Rascunho salvo! ID: ' + idAtual + ' - Anote este ID para carregar depois.', 'success');
         } else {
             showAlert('❌ Erro ao salvar: ' + resultado.mensagem, 'error');
         }
     } catch (error) {
         console.error('Erro:', error);
         showAlert('❌ Erro ao salvar rascunho', 'error');
+    }
+}
+
+// ===== CARREGAR RASCUNHO PELO ID =====
+async function carregarRascunho() {
+    const id = document.getElementById('inputCarregarRascunho').value.trim();
+    
+    if (!id) {
+        showAlert('❌ Digite o ID do rascunho!', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('btnCarregarRascunho');
+    const textoOriginal = btn.textContent;
+    btn.textContent = '⏳ Carregando...';
+    btn.disabled = true;
+    
+    try {
+        const dados = await carregarAlertaDaPlanilha(id);
+        
+        if (!dados) {
+            showAlert('❌ Rascunho não encontrado! Verifique o ID.', 'error');
+            btn.textContent = textoOriginal;
+            btn.disabled = false;
+            return;
+        }
+        
+        document.getElementById('alertaId').value = id;
+        document.getElementById('alertaIdDisplay').textContent = 'ID: ' + id;
+        
+        preencherCampos(dados);
+        atualizarStatus(dados.status || 'Rascunho');
+        
+        showAlert('✅ Rascunho carregado com sucesso!', 'success');
+        document.getElementById('inputCarregarRascunho').value = '';
+        
+    } catch (error) {
+        console.error('Erro ao carregar rascunho:', error);
+        showAlert('❌ Erro ao carregar rascunho', 'error');
+    } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
     }
 }
 
