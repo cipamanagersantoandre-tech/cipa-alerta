@@ -1664,8 +1664,8 @@ ${listaNomes}
 </html>
 `;
 
-// Enviar email em HTML
-const emailResultado = await enviarEmailViaScript(emails, assunto, corpo, idAtual, true);
+// Enviar email com anexos (USANDO A FUNÇÃO CORRETA)
+const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
         
         if (emailResultado.status === 'sucesso') {
             showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`, 'success');
