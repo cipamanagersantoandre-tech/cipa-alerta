@@ -1579,7 +1579,8 @@ async function enviarAlertaParaSetor() {
         // Lista de nomes para o corpo do email
         const listaNomes = destinatarios.map(d => `${d.nome || 'Responsável'} (${d.email})`).join('\n');
         
-        const corpo = `Prezados(as),
+const corpo = 
+`Prezados(as),
 
 A CIPA registrou um alerta de segurança que requer sua análise.
 
@@ -1592,7 +1593,7 @@ A CIPA registrou um alerta de segurança que requer sua análise.
 📋 Descrição do ocorrido:
 ${dados.oqueAconteceu}
 
-${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu + '\n' : ''}
+${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu : ''}
 
 📋 Destinatários deste alerta:
 ${listaNomes}
@@ -1908,7 +1909,7 @@ let corpo = `
 <head>
 <meta charset="UTF-8">
 </head>
-<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; white-space: pre-wrap;">
 
 <div style="background-color: #1e466e; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
     <h2 style="margin: 0;">✅ Alerta de Segurança Respondido</h2>
@@ -1927,7 +1928,7 @@ let corpo = `
 <h3 style="color: #1e466e;">📋 Resumo da Resposta</h3>
 
 <p><strong>O que aconteceu?</strong></p>
-<div style="background: #f9f0e9; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+<div style="background: #f9f0e9; padding: 12px; border-radius: 6px; margin-bottom: 12px; white-space: pre-wrap;">
     ${dados.oqueAconteceu}
 </div>
 
