@@ -1206,7 +1206,10 @@ function preencherCampos(dados) {
     if (dados.unidade) {
         document.getElementById('unidadeAlerta').value = dados.unidade;
     }
-    if (dados.acidenteData) {
+    // CORREÇÃO: Aceita tanto 'dataAlerta' quanto 'acidenteData'
+    if (dados.dataAlerta) {
+        document.getElementById('dataAlerta').value = dados.dataAlerta;
+    } else if (dados.acidenteData) {
         document.getElementById('dataAlerta').value = dados.acidenteData;
     }
     
