@@ -957,7 +957,7 @@ async function carregarAlertaDaPlanilha(id) {
 
 
 async function enviarEmailViaScript(destino, assunto, corpo, alertaId) {
-    const url = `${GOOGLE_API_URL}?acao=enviarEmail&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}`;
+    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}`;
     const response = await fetch(url);
     return await response.json();
 }
