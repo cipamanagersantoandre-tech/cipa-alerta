@@ -981,6 +981,43 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     }
 }
 
+// ===== FUNÇÃO PARA FAZER UPLOAD DE IMAGEM PARA O GOOGLE DRIVE =====
+async function uploadImagemParaDrive(base64Data, nomeArquivo) {
+    try {
+        // Remove o prefixo "data:image/...;base64,"
+        const base64Puro = base64Data.split(',')[1] || base64Data;
+        
+        // Cria um blob a partir do Base64
+        const blob = await fetch(base64Data).then(res => res.blob());
+        
+        // Prepara o formulário para envio
+        const formData = new FormData();
+        formData.append('acao', 'uploadBanner');
+        formData.append('arquivo', base64Puro);
+        formData.append('tipo', blob.type || 'image/jpeg');
+        formData.append('identificador', nomeArquivo);
+        
+        // Envia para o Google Apps Script
+        const response = await fetch(GOOGLE_API_URL, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        console.log('📤 Upload concluído:', result);
+        
+        if (result.status === 'sucesso') {
+            return result.link; // Retorna o link público da imagem
+        } else {
+            console.error('❌ Erro no upload:', result.mensagem);
+            return null;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao fazer upload:', error);
+        return null;
+    }
+}
+
 function showAlert(message, type = 'success') {
     const container = document.getElementById('alertContainer');
     if (!container) {
@@ -1945,8 +1982,20 @@ async function devolverAlerta() {
         const assunto = `✅ Alerta de Segurança Respondido - ${alertaId}`;
         const link = window.location.href.split('?')[0] + '?id=' + alertaId;
         
-        // 10. Montar o corpo do e-mail em TEXTO PLANO
-        const corpo = 
+// 10. Fazer upload das fotos para o Google Drive
+let linksFotos = [];
+if (fotosBase64.length > 0) {
+    showAlert('📤 Enviando fotos para o Drive...', 'info');
+    for (let i = 0; i < fotosBase64.length; i++) {
+        const link = await uploadImagemParaDrive(fotosBase64[i], `foto_alerta_${alertaId}_${i+1}.jpg`);
+        if (link) {
+            linksFotos.push(link);
+        }
+    }
+}
+
+// 11. Montar o corpo do e-mail em TEXTO PLANO (com os links das fotos)
+let corpo = 
 `Prezados(as),
 
 O alerta de segurança foi respondido e devolvido.
@@ -1971,23 +2020,30 @@ ${dados.licaoAprendida}
 🛡️ Medidas de Prevenção
 1. ${dados.prevencao1}
 ${dados.prevencao2 ? '2. ' + dados.prevencao2 : ''}
-${dados.prevencao3 ? '3. ' + dados.prevencao3 : ''}
+${dados.prevencao3 ? '3. ' + dados.prevencao3 : ''}`;
 
-🔗 Link de Acesso:
+// Adicionar os links das fotos se houver
+if (linksFotos.length > 0) {
+    corpo += `\n\n📸 Fotos anexadas:\n`;
+    for (let i = 0; i < linksFotos.length; i++) {
+        corpo += `${i+1}. ${linksFotos[i]}\n`;
+    }
+}
+
+corpo += `\n🔗 Link de Acesso:
 ${link}
 
 Atenciosamente,
 ${nomeResponsavel}`;
 
-        // 11. Enviar email com as fotos como ANEXOS
-        const emailResultado = await enviarEmailComAnexos(
-            emails,
-            assunto,
-            corpo,
-            alertaId,
-            fotosBase64
-        );
-        
+// 12. Enviar email com os links das fotos (sem anexos)
+const emailResultado = await enviarEmailComAnexos(
+    emails,
+    assunto,
+    corpo,
+    alertaId,
+    []  // ← Array vazio, sem anexos
+);        
         // 12. Mostrar resultado
         if (emailResultado.status === 'sucesso') {
             showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`, 'success');
