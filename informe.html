@@ -945,7 +945,7 @@
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
-// ===== FUNÇÃO PARA ENVIAR EMAIL (IGUAL AO FORMULÁRIO) =====
+// ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (VERSÃO CORRIGIDA) =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     // Montar os anexos como JSON
     var anexosJson = [];
@@ -959,7 +959,7 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         }
     }
     
-    // ===== EXATAMENTE IGUAL AO FORMULÁRIO =====
+    // ===== EXATAMENTE IGUAL AO QUE FUNCIONA NO APP =====
     const dadosStr = encodeURIComponent(JSON.stringify({
         destino: destino,
         assunto: assunto,
@@ -968,11 +968,12 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         anexos: anexosJson
     }));
     
-    // Usa o mesmo padrão do formulário: ?acao=enviarEmail&aba=alertas&dados=...
     const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&dados=${dadosStr}`;
     
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'GET'  // ← USANDO GET (que funciona no APP)
+        });
         return await response.json();
     } catch (error) {
         console.error('Erro ao enviar email:', error);
