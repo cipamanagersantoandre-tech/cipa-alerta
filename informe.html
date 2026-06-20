@@ -1007,8 +1007,8 @@ async function carregarAlertaDaPlanilha(id) {
 
 
 
-async function enviarEmailViaScript(destino, assunto, corpo, alertaId) {
-    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}`;
+async function enviarEmailViaScript(destino, assunto, corpo, alertaId, isHtml = false) {
+    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}&html=${isHtml}`;
     const response = await fetch(url);
     return await response.json();
 }
@@ -1579,37 +1579,77 @@ async function enviarAlertaParaSetor() {
         // Lista de nomes para o corpo do email
         const listaNomes = destinatarios.map(d => `${d.nome || 'Responsável'} (${d.email})`).join('\n');
         
-const corpo = 
-`Prezados(as),
+// Montar o corpo do e-mail em HTML
+const corpo = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; white-space: pre-wrap;">
 
-A CIPA registrou um alerta de segurança que requer sua análise.
+<div style="background-color: #1e466e; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+    <h2 style="margin: 0;">🚨 Alerta de Segurança</h2>
+</div>
 
-📋 Enviado por: ${nomeResponsavel}
-🔹 Alerta: ${dados.titulo}
-🔹 Unidade: ${dados.unidade || 'Não informada'}
-🔹 Data: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
-🔹 Local: ${dados.local || 'Não informado'}
+<p><strong>Prezados(as),</strong></p>
 
-📋 Descrição do ocorrido:
-${dados.oqueAconteceu}
+<p>A CIPA registrou um alerta de segurança que requer sua análise.</p>
 
-${dados.porqueAconteceu ? '📋 Causa identificada:\n' + dados.porqueAconteceu : ''}
+<table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <tr><td style="padding: 4px 0;"><strong>📋 Enviado por:</strong></td><td style="padding: 4px 0;">${nomeResponsavel}</td></tr>
+    <tr><td style="padding: 4px 0;"><strong>🔹 Alerta:</strong></td><td style="padding: 4px 0;">${dados.titulo}</td></tr>
+    <tr><td style="padding: 4px 0;"><strong>🔹 Unidade:</strong></td><td style="padding: 4px 0;">${dados.unidade || 'Não informada'}</td></tr>
+    <tr><td style="padding: 4px 0;"><strong>🔹 Data:</strong></td><td style="padding: 4px 0;">${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}</td></tr>
+    <tr><td style="padding: 4px 0;"><strong>🔹 Local:</strong></td><td style="padding: 4px 0;">${dados.local || 'Não informado'}</td></tr>
+</table>
 
-📋 Destinatários deste alerta:
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #1e466e;">📋 Descrição do ocorrido:</h3>
+<div style="background: #f9f0e9; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+    ${dados.oqueAconteceu}
+</div>
+
+${dados.porqueAconteceu ? `
+<h3 style="color: #1e466e;">📋 Causa identificada:</h3>
+<div style="background: #fbf4d7; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+    ${dados.porqueAconteceu}
+</div>
+` : ''}
+
+<h3 style="color: #1e466e;">📋 Destinatários deste alerta:</h3>
+<div style="background: #e7f1ec; padding: 12px; border-radius: 6px; margin-bottom: 15px; white-space: pre-wrap;">
 ${listaNomes}
+</div>
 
-🔗 Para analisar e preencher o alerta, acesse o link abaixo:
-${link}
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
 
-Instruções:
-1. Clique no link acima
-2. Preencha os campos: "Por que aconteceu?", "Lição Aprendida" e "Prevenção"
-3. Clique em "Devolver Alerta" quando concluir
+<h3 style="color: #1e466e;">🔗 Para analisar e preencher o alerta, acesse o link abaixo:</h3>
+<p style="background: #f0f2f5; padding: 12px; border-radius: 6px; word-break: break-all;">
+    <a href="${link}" style="color: #1e466e; font-weight: bold;">${link}</a>
+</p>
 
-Atenciosamente,
-${nomeResponsavel}`;
+<h3 style="color: #1e466e;">📋 Instruções:</h3>
+<ol style="background: #f9fbfd; padding: 12px 12px 12px 30px; border-radius: 6px; border: 1px solid #14529a;">
+    <li>Clique no link acima</li>
+    <li>Preencha os campos: "Por que aconteceu?", "Lição Aprendida" e "Prevenção"</li>
+    <li>Clique em "Devolver Alerta" quando concluir</li>
+</ol>
 
-        const emailResultado = await enviarEmailViaScript(emails, assunto, corpo, idAtual);
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<div style="background-color: #f8f9fc; padding: 15px; border-radius: 8px; text-align: center; color: #6b7280; font-size: 12px;">
+    Atenciosamente,<br>
+    <strong>${nomeResponsavel}</strong>
+</div>
+
+</body>
+</html>
+`;
+
+// Enviar email em HTML
+const emailResultado = await enviarEmailViaScript(emails, assunto, corpo, idAtual, true);
         
         if (emailResultado.status === 'sucesso') {
             showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`, 'success');
