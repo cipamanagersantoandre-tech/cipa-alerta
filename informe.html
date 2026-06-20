@@ -945,6 +945,7 @@
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
+// ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (USANDO O MESMO FORMATO DO FORMULÁRIO) =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     // Montar os anexos como JSON
     var anexosJson = [];
@@ -958,25 +959,30 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         }
     }
     
-    // 🔥 MUDANÇA: USAR POST EM VEZ DE GET
-    const body = new URLSearchParams();
-    body.append('acao', 'enviarEmail');
-    body.append('aba', 'alertas');
-    body.append('destino', destino);
-    body.append('assunto', assunto);
-    body.append('corpo', corpo);
-    body.append('alertaId', alertaId);
-    body.append('anexos', JSON.stringify(anexosJson));
-
-    const response = await fetch(GOOGLE_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: body.toString()
-    });
+    // ===== USAR O MESMO FORMATO DO FORMULÁRIO =====
+    // Em vez de POST com URLSearchParams, usar GET com parâmetros na URL (igual ao formulário)
+    const params = new URLSearchParams();
+    params.append('acao', 'enviarEmail');
+    params.append('aba', 'alertas');
+    params.append('destino', destino);
+    params.append('assunto', assunto);
+    params.append('corpo', corpo);
+    params.append('alertaId', alertaId);
+    params.append('anexos', JSON.stringify(anexosJson));
     
-    return await response.json();
+    // Monta a URL com os parâmetros (igual ao formulário)
+    const url = `${GOOGLE_API_URL}?${params.toString()}`;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'GET'  // ← Mudando para GET, igual ao formulário
+        });
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao enviar email:', error);
+        return { status: 'erro', mensagem: error.toString() };
+    }
 }
 
 function showAlert(message, type = 'success') {
