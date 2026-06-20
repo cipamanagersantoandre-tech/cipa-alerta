@@ -1284,6 +1284,13 @@ function preencherCampos(dados) {
             setorSelect.value = dados.setorResponsavel;
         }
     }
+    
+    // ===== FORÇAR ATUALIZAÇÃO DOS TEXTOS PARA IMPRESSÃO =====
+    // Atualiza data e unidade para impressão
+    atualizarTextoImpressao();
+    
+    // Atualiza todos os textos dos blocos para impressão
+    atualizarTextoPrint();
 }
 
 // ===== CARREGAR SETORES PARA O SELECT =====
