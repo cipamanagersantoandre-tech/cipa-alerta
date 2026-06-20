@@ -2197,46 +2197,67 @@ function popularSelectSetores(setores) {
     setupFoto(2);
 
 // ----- LOGO EDITÁVEL (IMAGEM) -----
-    const inputLogo = document.getElementById('inputLogo');
-    const btnInserirLogo = document.getElementById('btnInserirLogo');
-    const btnRemoverLogo = document.getElementById('btnRemoverLogo');
-    const btnXRemoverLogo = document.getElementById('btnXRemoverLogo');
-    const botoesLogo = document.getElementById('botoesLogo');
-    const logoImagem = document.getElementById('logoImagem');
-    const logoPlaceholder = document.getElementById('logoPlaceholder');
+const inputLogo = document.getElementById('inputLogo');
+const btnInserirLogo = document.getElementById('btnInserirLogo');
+const btnRemoverLogo = document.getElementById('btnRemoverLogo');
+const btnXRemoverLogo = document.getElementById('btnXRemoverLogo');
+const botoesLogo = document.getElementById('botoesLogo');
+const logoImagem = document.getElementById('logoImagem');
+const logoPlaceholder = document.getElementById('logoPlaceholder');
 
-    btnInserirLogo.addEventListener('click', () => {
-        inputLogo.click();
-    });
+// ===== FUNÇÃO PARA CARREGAR O LOGO =====
+function carregarLogo(url) {
+    const img = new Image();
+    img.onload = function() {
+        logoImagem.src = url;
+        logoImagem.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        botoesLogo.style.display = 'none';
+        btnXRemoverLogo.style.display = 'inline-block';
+    };
+    img.onerror = function() {
+        // Se a imagem não carregar, mantém o placeholder
+        console.log('Logo não carregou. Usando placeholder.');
+    };
+    img.src = url;
+}
 
-    inputLogo.addEventListener('change', (e) => {
-        const arquivo = e.target.files[0];
-        if (arquivo) {
-            const leitor = new FileReader();
-            leitor.onload = function(evento) {
-                logoImagem.src = evento.target.result;
-                logoImagem.style.display = 'block';
-                logoPlaceholder.style.display = 'none';
-                // Esconde os botões e mostra só o X
-                botoesLogo.style.display = 'none';
-                btnXRemoverLogo.style.display = 'inline-block';
-            };
-            leitor.readAsDataURL(arquivo);
-        }
-    });
+// ===== CARREGAR LOGO AUTOMATICAMENTE AO ABRIR A PÁGINA =====
+const LOGO_URL = 'https://lh3.googleusercontent.com/d/1IxAvEHlQ6RqYpt5FLPSwXf08g4yqqWFp';
+carregarLogo(LOGO_URL);
 
-    // Função para remover o logo (tanto pelo botão antigo quanto pelo X)
-    function removerLogo() {
-        logoImagem.src = '';
-        logoImagem.style.display = 'none';
-        logoPlaceholder.style.display = 'block';
-        botoesLogo.style.display = 'block';
-        btnXRemoverLogo.style.display = 'none';
-        inputLogo.value = '';
+// ===== BOTÃO PARA INSERIR LOGO POR ARQUIVO =====
+btnInserirLogo.addEventListener('click', () => {
+    inputLogo.click();
+});
+
+inputLogo.addEventListener('change', (e) => {
+    const arquivo = e.target.files[0];
+    if (arquivo) {
+        const leitor = new FileReader();
+        leitor.onload = function(evento) {
+            logoImagem.src = evento.target.result;
+            logoImagem.style.display = 'block';
+            logoPlaceholder.style.display = 'none';
+            botoesLogo.style.display = 'none';
+            btnXRemoverLogo.style.display = 'inline-block';
+        };
+        leitor.readAsDataURL(arquivo);
     }
+});
 
-    btnRemoverLogo.addEventListener('click', removerLogo);
-    btnXRemoverLogo.addEventListener('click', removerLogo);
+// ===== FUNÇÃO PARA REMOVER O LOGO =====
+function removerLogo() {
+    logoImagem.src = '';
+    logoImagem.style.display = 'none';
+    logoPlaceholder.style.display = 'block';
+    botoesLogo.style.display = 'block';
+    btnXRemoverLogo.style.display = 'none';
+    inputLogo.value = '';
+}
+
+btnRemoverLogo.addEventListener('click', removerLogo);
+btnXRemoverLogo.addEventListener('click', removerLogo);
 
 // ===== NOVO: CARREGAR LOGO POR LINK =====
 const inputLogoLink = document.getElementById('inputLogoLink');
