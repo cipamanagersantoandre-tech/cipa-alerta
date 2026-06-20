@@ -1795,6 +1795,19 @@ async function devolverAlerta() {
         dataResposta: new Date().toISOString()
     };
     
+// Pegar as fotos (se houver)
+const foto1 = document.getElementById('previewFoto1');
+const foto2 = document.getElementById('previewFoto2');
+
+let fotosBase64 = [];
+
+if (foto1 && foto1.src && foto1.src.startsWith('data:image')) {
+    fotosBase64.push(foto1.src);
+}
+if (foto2 && foto2.src && foto2.src.startsWith('data:image')) {
+    fotosBase64.push(foto2.src);
+}
+
     try {
         // 1. Salvar na planilha
         const resultado = await salvarAlertaNaPlanilha(alertaId, dados);
@@ -1812,28 +1825,126 @@ async function devolverAlerta() {
         const assunto = `✅ Alerta de Segurança Respondido - ${alertaId}`;
         const nomeResponsavel = document.getElementById('elaboradoPor').value.trim() || 'Setor Responsável';
         
-        const corpo = `Prezada CIPA,
+// ===== CORPO DO E-MAIL EM HTML (COM FOTOS) =====
+const link = window.location.href.split('?')[0] + '?id=' + alertaId;
 
-O alerta de segurança foi analisado e respondido pelo setor responsável.
+// Pegar as fotos que estão na tela
+const preview1 = document.getElementById('previewFoto1');
+const preview2 = document.getElementById('previewFoto2');
 
-🔹 Alerta: ${dados.titulo}
-🔹 ID: ${alertaId}
-🔹 Unidade: ${dados.unidade || 'Não informada'}
-🔹 Data do Alerta: ${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}
-🔹 Data da Resposta: ${new Date().toLocaleString('pt-BR')}
+let temFoto1 = false;
+let temFoto2 = false;
+let foto1Src = '';
+let foto2Src = '';
 
-📋 Resumo da Resposta:
-- O que aconteceu: ${dados.oqueAconteceu}
-- Por que aconteceu: ${dados.porqueAconteceu}
-- Lição aprendida: ${dados.licaoAprendida}
+if (preview1 && preview1.src && preview1.src.startsWith('data:image')) {
+    temFoto1 = true;
+    foto1Src = preview1.src;
+}
+if (preview2 && preview2.src && preview2.src.startsWith('data:image')) {
+    temFoto2 = true;
+    foto2Src = preview2.src;
+}
 
-🛡️ Medidas de Prevenção:
-1. ${dados.prevencao1}
-${dados.prevencao2 ? '2. ' + dados.prevencao2 : ''}
-${dados.prevencao3 ? '3. ' + dados.prevencao3 : ''}
 
-Atenciosamente,
-${nomeResponsavel}`;
+// Montar o e-mail em HTML
+let corpo = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+<div style="background-color: #1e466e; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+    <h2 style="margin: 0;">✅ Alerta de Segurança Respondido</h2>
+</div>
+
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+    <tr><td style="padding: 6px 0;"><strong>ID do Alerta:</strong></td><td style="padding: 6px 0;">${alertaId}</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>Título:</strong></td><td style="padding: 6px 0;">${dados.titulo}</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>Unidade:</strong></td><td style="padding: 6px 0;">${dados.unidade || 'Não informada'}</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>Data do Alerta:</strong></td><td style="padding: 6px 0;">${dados.dataAlerta ? new Date(dados.dataAlerta).toLocaleDateString('pt-BR') : 'Não informada'}</td></tr>
+    <tr><td style="padding: 6px 0;"><strong>Data da Resposta:</strong></td><td style="padding: 6px 0;">${new Date().toLocaleString('pt-BR')}</td></tr>
+</table>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #1e466e;">📋 Resumo da Resposta</h3>
+
+<p><strong>O que aconteceu?</strong></p>
+<div style="background: #f9f0e9; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+    ${dados.oqueAconteceu}
+</div>
+
+<p><strong>Por que aconteceu?</strong></p>
+<div style="background: #fbf4d7; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+    ${dados.porqueAconteceu}
+</div>
+
+<p><strong>Lição Aprendida</strong></p>
+<div style="background: #e7f1ec; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+    ${dados.licaoAprendida}
+</div>
+
+<h3 style="color: #1e466e;">🛡️ Medidas de Prevenção</h3>
+<ol style="background: #f9fbfd; padding: 12px 12px 12px 30px; border-radius: 6px; border: 1px solid #14529a;">
+    <li>${dados.prevencao1}</li>
+    ${dados.prevencao2 ? '<li>' + dados.prevencao2 + '</li>' : ''}
+    ${dados.prevencao3 ? '<li>' + dados.prevencao3 + '</li>' : ''}
+</ol>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #1e466e;">📎 Fotos Anexadas</h3>
+`;
+
+// Adicionar as fotos se existirem
+if (temFoto1) {
+    corpo += `
+    <div style="margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; background: #f9f9f9;">
+        <p style="margin: 0 0 8px 0; font-weight: bold;">📷 Foto 1</p>
+        <img src="${foto1Src}" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid #ddd;">
+    </div>
+    `;
+}
+
+if (temFoto2) {
+    corpo += `
+    <div style="margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; background: #f9f9f9;">
+        <p style="margin: 0 0 8px 0; font-weight: bold;">📷 Foto 2</p>
+        <img src="${foto2Src}" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid #ddd;">
+    </div>
+    `;
+}
+
+if (!temFoto1 && !temFoto2) {
+    corpo += `
+    <div style="background: #f0f2f5; padding: 15px; border-radius: 6px; text-align: center; color: #6b7280;">
+        Nenhuma foto foi anexada.
+    </div>
+    `;
+}
+
+// Link de acesso
+corpo += `
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #1e466e;">🔗 Link de Acesso</h3>
+<p style="background: #f0f2f5; padding: 12px; border-radius: 6px; word-break: break-all;">
+    <a href="${link}" style="color: #1e466e; font-weight: bold;">${link}</a>
+</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<div style="background-color: #f8f9fc; padding: 15px; border-radius: 8px; text-align: center; color: #6b7280; font-size: 12px;">
+    Este e-mail foi enviado automaticamente pelo Sistema de Alertas CIPA.<br>
+    Em caso de dúvidas, entre em contato com a CIPA da sua unidade.
+</div>
+
+</body>
+</html>
+`;
 
         const emailResultado = await enviarEmailViaScript(emailCIPA, assunto, corpo, alertaId);
         
