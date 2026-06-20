@@ -947,13 +947,6 @@ const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpR
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
 // ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (VERSÃO CORRIGIDA) =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
-    console.log('🔵 FUNÇÃO enviarEmailComAnexos FOI CHAMADA');
-    console.log('🔵 Destino:', destino);
-    console.log('🔵 Assunto:', assunto);
-    console.log('🔵 alertaId:', alertaId);
-    console.log('🔵 anexos:', anexos);
-    console.log('🔵 Quantidade de anexos:', anexos ? anexos.length : 0);
-    
     // Montar os anexos como JSON
     var anexosJson = [];
     if (anexos && anexos.length > 0) {
@@ -966,8 +959,7 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         }
     }
     
-    console.log('🔵 anexosJson:', JSON.stringify(anexosJson));
-    
+    // ===== EXATAMENTE IGUAL AO QUE FUNCIONA NO APP =====
     const dadosStr = encodeURIComponent(JSON.stringify({
         destino: destino,
         assunto: assunto,
@@ -977,21 +969,18 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     }));
     
     const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&dados=${dadosStr}`;
-    console.log('🔵 URL:', url);
     
     try {
-        console.log('🔵 Enviando requisição...');
         const response = await fetch(url, {
-            method: 'GET'
+            method: 'GET'  // ← USANDO GET (que funciona no APP)
         });
-        const result = await response.json();
-        console.log('🔵 Resposta:', result);
-        return result;
+        return await response.json();
     } catch (error) {
-        console.error('❌ Erro ao enviar email:', error);
+        console.error('Erro ao enviar email:', error);
         return { status: 'erro', mensagem: error.toString() };
     }
 }
+
 function showAlert(message, type = 'success') {
     const container = document.getElementById('alertContainer');
     if (!container) {
