@@ -801,6 +801,13 @@
         <img id="logoImagem" style="max-width: 100px; max-height: 80px; display: none;">
         <div id="logoPlaceholder" style="font-size: 12px; color: #1e466e;">[CLIQUE PARA INSERIR LOGO]</div>
     </div>
+    
+    <!-- NOVO: CAMPO PARA LINK DO GOOGLE DRIVE -->
+    <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 3px;">
+        <input type="text" id="inputLogoLink" placeholder="ou cole o link da imagem" style="width: 100%; padding: 3px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px;">
+        <button type="button" id="btnCarregarLogoLink" style="background: #1e466e; color: white; border: none; padding: 3px 8px; border-radius: 3px; cursor: pointer; font-size: 11px;">🔗 Carregar link</button>
+    </div>
+    
     <input type="file" id="inputLogo" accept="image/*" style="display: none;">
     
     <div id="botoesLogo">
@@ -2230,6 +2237,57 @@ function popularSelectSetores(setores) {
 
     btnRemoverLogo.addEventListener('click', removerLogo);
     btnXRemoverLogo.addEventListener('click', removerLogo);
+
+// ===== NOVO: CARREGAR LOGO POR LINK =====
+const inputLogoLink = document.getElementById('inputLogoLink');
+const btnCarregarLogoLink = document.getElementById('btnCarregarLogoLink');
+
+btnCarregarLogoLink.addEventListener('click', function() {
+    const link = inputLogoLink.value.trim();
+    
+    if (!link) {
+        alert('❌ Cole um link válido da imagem!');
+        return;
+    }
+    
+    // Verifica se é um link do Google Drive
+    let imagemUrl = link;
+    
+    // Se for link do Google Drive, converte para link direto
+    if (link.includes('drive.google.com')) {
+        // Extrai o ID do arquivo
+        const match = link.match(/[-\w]{25,}/);
+        if (match) {
+            imagemUrl = 'https://drive.google.com/uc?export=view&id=' + match[0];
+        } else {
+            alert('❌ Não foi possível extrair o ID da imagem. Verifique o link.');
+            return;
+        }
+    }
+    
+    // Testar se a imagem carrega
+    const imgTest = new Image();
+    imgTest.onload = function() {
+        logoImagem.src = imagemUrl;
+        logoImagem.style.display = 'block';
+        logoPlaceholder.style.display = 'none';
+        botoesLogo.style.display = 'none';
+        btnXRemoverLogo.style.display = 'inline-block';
+        inputLogoLink.value = '';
+        showAlert('✅ Logo carregado com sucesso!', 'success');
+    };
+    imgTest.onerror = function() {
+        alert('❌ Erro ao carregar a imagem. Verifique se o link está correto e se a imagem é pública.');
+    };
+    imgTest.src = imagemUrl;
+});
+
+// Também permite carregar ao pressionar Enter no campo
+inputLogoLink.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        btnCarregarLogoLink.click();
+    }
+});
 
     // ----- IMPRIMIR / PDF (funciona na nuvem e local)-----
     document.getElementById('btnImprimir').addEventListener('click', () => {
