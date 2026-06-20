@@ -945,7 +945,7 @@
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
-// ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (USANDO O MESMO FORMATO DO FORMULÁRIO) =====
+// ===== FUNÇÃO PARA ENVIAR EMAIL (IGUAL AO FORMULÁRIO) =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     // Montar os anexos como JSON
     var anexosJson = [];
@@ -959,25 +959,20 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         }
     }
     
-    // ===== USAR O MESMO FORMATO DO FORMULÁRIO =====
-    // Em vez de POST com URLSearchParams, usar GET com parâmetros na URL (igual ao formulário)
-    const params = new URLSearchParams();
-    params.append('acao', 'enviarEmail');
-    params.append('aba', 'alertas');
-    params.append('destino', destino);
-    params.append('assunto', assunto);
-    params.append('corpo', corpo);
-    params.append('alertaId', alertaId);
-    params.append('anexos', JSON.stringify(anexosJson));
+    // ===== EXATAMENTE IGUAL AO FORMULÁRIO =====
+    const dadosStr = encodeURIComponent(JSON.stringify({
+        destino: destino,
+        assunto: assunto,
+        corpo: corpo,
+        alertaId: alertaId,
+        anexos: anexosJson
+    }));
     
-    // Monta a URL com os parâmetros (igual ao formulário)
-    const url = `${GOOGLE_API_URL}?${params.toString()}`;
+    // Usa o mesmo padrão do formulário: ?acao=enviarEmail&aba=alertas&dados=...
+    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&dados=${dadosStr}`;
     
     try {
-        const response = await fetch(url, {
-            method: 'GET'  // ← Mudando para GET, igual ao formulário
-        });
-        
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         console.error('Erro ao enviar email:', error);
