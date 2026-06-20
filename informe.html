@@ -935,9 +935,24 @@ async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
         }
     }
     
-    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}&anexos=${encodeURIComponent(JSON.stringify(anexosJson))}`;
+    // 🔥 MUDANÇA: USAR POST EM VEZ DE GET
+    const body = new URLSearchParams();
+    body.append('acao', 'enviarEmail');
+    body.append('aba', 'alertas');
+    body.append('destino', destino);
+    body.append('assunto', assunto);
+    body.append('corpo', corpo);
+    body.append('alertaId', alertaId);
+    body.append('anexos', JSON.stringify(anexosJson));
+
+    const response = await fetch(GOOGLE_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body.toString()
+    });
     
-    const response = await fetch(url);
     return await response.json();
 }
 
