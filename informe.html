@@ -921,6 +921,28 @@
 
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 
+// ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
+async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
+    // Montar a URL com os anexos codificados
+    let url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}`;
+    
+    // Adicionar cada anexo na URL
+    if (anexos && anexos.length > 0) {
+        for (let i = 0; i < anexos.length; i++) {
+            // Pegar apenas a parte Base64 (remover "data:image/png;base64,")
+            const base64Data = anexos[i].split(',')[1] || anexos[i];
+            url += `&anexo${i+1}=${encodeURIComponent(base64Data)}`;
+            url += `&anexo${i+1}_nome=foto_${i+1}.jpg`;
+        }
+    }
+    
+    const response = await fetch(url);
+    return await response.json();
+}
+
+function showAlert(message, type = 'success') {
+    // ... resto do código que já existe
+
 function showAlert(message, type = 'success') {
     const container = document.getElementById('alertContainer');
     if (!container) {
@@ -1946,7 +1968,14 @@ corpo += `
 </html>
 `;
 
-        const emailResultado = await enviarEmailViaScript(emailCIPA, assunto, corpo, alertaId);
+        // Enviar email com as fotos como anexos
+const emailResultado = await enviarEmailComAnexos(
+    emailCIPA, 
+    assunto, 
+    corpo, 
+    alertaId,
+    fotosBase64  // ← ENVIA AS IMAGENS SEPARADAMENTE
+);
         
         if (emailResultado.status === 'sucesso') {
             showAlert(`📧 Email enviado para ${emailCIPA}!`, 'success');
@@ -1959,6 +1988,7 @@ corpo += `
         showAlert('❌ Erro ao devolver alerta', 'error');
     }
 }
+
 
 // ===== SALVAR RASCUNHO =====
 
