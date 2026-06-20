@@ -923,18 +923,19 @@ const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpR
 
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
-    // Montar a URL com os anexos codificados
-    let url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}`;
-    
-    // Adicionar cada anexo na URL
+    // Montar os anexos como JSON
+    var anexosJson = [];
     if (anexos && anexos.length > 0) {
-        for (let i = 0; i < anexos.length; i++) {
-            // Pegar apenas a parte Base64 (remover "data:image/png;base64,")
-            const base64Data = anexos[i].split(',')[1] || anexos[i];
-            url += `&anexo${i+1}=${encodeURIComponent(base64Data)}`;
-            url += `&anexo${i+1}_nome=foto_${i+1}.jpg`;
+        for (var i = 0; i < anexos.length; i++) {
+            var base64Data = anexos[i].split(',')[1] || anexos[i];
+            anexosJson.push({
+                base64: base64Data,
+                nome: 'foto_' + (i+1) + '.jpg'
+            });
         }
     }
+    
+    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&destino=${encodeURIComponent(destino)}&assunto=${encodeURIComponent(assunto)}&corpo=${encodeURIComponent(corpo)}&alertaId=${encodeURIComponent(alertaId)}&anexos=${encodeURIComponent(JSON.stringify(anexosJson))}`;
     
     const response = await fetch(url);
     return await response.json();
