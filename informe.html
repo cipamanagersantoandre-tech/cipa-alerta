@@ -718,8 +718,9 @@
         </button>
         
         <!-- Botão Devolver Alerta -->
-        <button class="btn-topo" id="btnDevolverAlerta" style="background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
-            📤 Devolver Alerta
+<button class="btn-topo" id="btnDevolverAlerta" style="display: none; background: #c55a11; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">
+    📤 Devolver Alerta
+</button>
         </button>
         
         <!-- Botão Configurações -->
@@ -918,13 +919,13 @@
     <!-- RODAPÉ -->
     <div class="rodape-info">
         <div>Elaborado por: <input type="text" id="elaboradoPor" placeholder="CIPA / UO" style="width:180px;"></div>
-        <div>Contato: cipa_da_uo@sescsp.org.br</div>
+        <div>Contato: cipa.santoandre@sescsp.org.br</div>
     </div>
 
     <!-- BOTÕES DE AÇÃO -->
     <div class="botoes-acao">
         <button class="btn" id="btnImprimir">🖨️ Imprimir / Salvar PDF</button>
-        <button class="btn-vermelho btn" id="btnDevolverAlerta">📤 Devolver Alerta</button>
+        <button class="btn-vermelho btn" id="btnDevolverAlerta" style="display: none;">📤 Devolver Alerta</button>
         <button class="btn-cinza btn" id="btnLimpar">🗑️ Limpar tudo</button>
     </div>
 
@@ -935,7 +936,7 @@
         <h4>📘 Guia rápido de uso <button class="icone-ajuda" onclick="mostrarAjudaGuia()">📋</button></h4>
         <p><strong>Como preencher:</strong> Digite diretamente nos campos. Para foto: clique em "Inserir imagem".</p>
         <p><strong>Imprimir/PDF:</strong> Clique em "Imprimir / Salvar PDF" → escolha "Salvar como PDF" ou imprimir.</p>
-        <p><strong>Devolver Alerta:</strong> O botão devolve os dados preenchidos para a CIPA.</p>
+        <p><strong>Devolver Alerta:</strong> Envie o PDF gerado para a CIPA por e-mail.</p>
         <p><strong>Limpar:</strong> Apaga todos os campos preenchidos.</p>
     </div>
 </div>
