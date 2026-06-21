@@ -109,14 +109,15 @@
             font-weight: bold;
             color: #1e466e;
         }
-        .info-item input, .info-item select {
-            width: 100%;
-            padding: 6px;
-            margin-top: 5px;
-            border: 1px solid #aaa;
-            border-radius: 4px;
-            font-weight: normal;
-        }
+.info-item input, .info-item select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-weight: normal;
+    font-size: 14px;
+}
         .grid-duas-colunas {
             display: flex;
             gap: 25px;
@@ -146,7 +147,7 @@
     border: 1px solid #aaa;
     border-radius: 4px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 15px;
     resize: vertical;
     overflow: visible;
 }
@@ -186,6 +187,7 @@
     border: 1px solid #ccc;
     padding: 8px;
     font-family: inherit;
+    font-size: 15px;
     min-height: 100px;
     overflow: visible;
 }
@@ -287,7 +289,7 @@
     /* ===== CONFIGURAÇÕES PARA IMPRESSÃO ===== */
 @media print {
     /* Esconde botões de ajuda */
-.icone-ajuda, .btn-foto, #btnInserirFoto, #btnRemoverFoto, #btnRemoverFoto1, #btnRemoverFoto2, #btnInserirLogo, #btnRemoverLogo, #btnXRemoverLogo, #botoesLogo, #inputLogoLink, #btnCarregarLogoLink {
+.icone-ajuda, .btn-foto, #btnInserirFoto, #btnRemoverFoto, #btnRemoverFoto1, #btnRemoverFoto2, #btnRemoverFoto3, #btnRemoverFoto4, #btnInserirLogo, #btnRemoverLogo, #btnXRemoverLogo, #botoesLogo, #inputLogoLink, #btnCarregarLogoLink {
     display: none !important;
 }
     
@@ -311,17 +313,21 @@
         display: none !important;
     }
         
-    /* Mantém as fotos lado a lado na impressão */
+    /* Mantém as fotos em grade 2x2 na impressão */
     .coluna > div[style*="display: flex"] {
         display: flex !important;
-        gap: 15px !important;
-        flex-direction: row !important;
+        gap: 5px !important;
+    }
+    
+    .coluna > div[style*="flex-direction: column"] > div {
+        display: flex !important;
+        gap: 5px !important;
     }
         
     .foto-area {
         flex: 1 !important;
         margin: 0 !important;
-        padding: 5px !important;
+        padding: 3px !important;
     }
 
     /* Esconde o guia rápido e o hr */
@@ -436,11 +442,11 @@
         max-height: 80px !important;
     }
         
-    #previewFoto1, #previewFoto2 {
-        max-height: 100px !important;
-        max-width: 100% !important;
-        object-fit: contain !important;
-    }
+#previewFoto1, #previewFoto2, #previewFoto3, #previewFoto4 {
+    max-height: 80px !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+}
         
     .foto-area {
         padding: 5px !important;
@@ -875,22 +881,44 @@
     <div class="grid-duas-colunas">
 <div class="coluna">
     <h3 style="background-color: #14529a;">3. FOTO / EVIDÊNCIA VISUAL <button class="icone-ajuda" onclick="mostrarAjuda('foto')">📋</button></h3>
-    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
-            <p>📷 Foto 1</p>
-            <input type="file" id="inputFoto1" accept="image/*" style="display:none;">
-            <button class="btn-foto" data-foto="1">➕ Inserir foto 1</button>
-            <br>
-            <img id="previewFoto1" class="foto-preview" style="display:none; max-width:100%; margin-top:10px;">
-            <button id="btnRemoverFoto1" style="display:none; margin-top:8px; background:#c55a11; color:white; border:none; padding:4px 8px; border-radius:4px;">❌ Remover foto 1</button>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- LINHA 1: Foto 1 e Foto 2 -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
+                <p style="font-size: 12px; margin: 0 0 5px 0;">📷 Foto 1</p>
+                <input type="file" id="inputFoto1" accept="image/*" style="display:none;">
+                <button class="btn-foto" data-foto="1">➕ Inserir foto 1</button>
+                <br>
+                <img id="previewFoto1" class="foto-preview" style="display:none; max-width:100%; max-height:150px; margin-top:5px;">
+                <button id="btnRemoverFoto1" style="display:none; margin-top:4px; background:#c55a11; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:11px;">❌ Remover foto 1</button>
+            </div>
+            <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
+                <p style="font-size: 12px; margin: 0 0 5px 0;">📷 Foto 2</p>
+                <input type="file" id="inputFoto2" accept="image/*" style="display:none;">
+                <button class="btn-foto" data-foto="2">➕ Inserir foto 2</button>
+                <br>
+                <img id="previewFoto2" class="foto-preview" style="display:none; max-width:100%; max-height:150px; margin-top:5px;">
+                <button id="btnRemoverFoto2" style="display:none; margin-top:4px; background:#c55a11; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:11px;">❌ Remover foto 2</button>
+            </div>
         </div>
-        <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
-            <p>📷 Foto 2</p>
-            <input type="file" id="inputFoto2" accept="image/*" style="display:none;">
-            <button class="btn-foto" data-foto="2">➕ Inserir foto 2</button>
-            <br>
-            <img id="previewFoto2" class="foto-preview" style="display:none; max-width:100%; margin-top:10px;">
-            <button id="btnRemoverFoto2" style="display:none; margin-top:8px; background:#c55a11; color:white; border:none; padding:4px 8px; border-radius:4px;">❌ Remover foto 2</button>
+        <!-- LINHA 2: Foto 3 e Foto 4 -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
+                <p style="font-size: 12px; margin: 0 0 5px 0;">📷 Foto 3</p>
+                <input type="file" id="inputFoto3" accept="image/*" style="display:none;">
+                <button class="btn-foto" data-foto="3">➕ Inserir foto 3</button>
+                <br>
+                <img id="previewFoto3" class="foto-preview" style="display:none; max-width:100%; max-height:150px; margin-top:5px;">
+                <button id="btnRemoverFoto3" style="display:none; margin-top:4px; background:#c55a11; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:11px;">❌ Remover foto 3</button>
+            </div>
+            <div class="foto-area" style="background-color: #f9fbfd; flex: 1;">
+                <p style="font-size: 12px; margin: 0 0 5px 0;">📷 Foto 4</p>
+                <input type="file" id="inputFoto4" accept="image/*" style="display:none;">
+                <button class="btn-foto" data-foto="4">➕ Inserir foto 4</button>
+                <br>
+                <img id="previewFoto4" class="foto-preview" style="display:none; max-width:100%; max-height:150px; margin-top:5px;">
+                <button id="btnRemoverFoto4" style="display:none; margin-top:4px; background:#c55a11; color:white; border:none; padding:3px 6px; border-radius:4px; font-size:11px;">❌ Remover foto 4</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1724,14 +1752,11 @@ ${listaNomes}
 
 // Coletar as fotos (base64) antes de enviar
 const fotosBase64 = [];
-const foto1 = document.getElementById('previewFoto1');
-const foto2 = document.getElementById('previewFoto2');
-
-if (foto1 && foto1.src && foto1.src.startsWith('data:image')) {
-    fotosBase64.push(foto1.src);
-}
-if (foto2 && foto2.src && foto2.src.startsWith('data:image')) {
-    fotosBase64.push(foto2.src);
+for (var f = 1; f <= 4; f++) {
+    var foto = document.getElementById('previewFoto' + f);
+    if (foto && foto.src && foto.src.startsWith('data:image')) {
+        fotosBase64.push(foto.src);
+    }
 }
 
 // Enviar email com anexos (agora com as fotos!)
@@ -2286,6 +2311,8 @@ function popularSelectSetores(setores) {
     
     setupFoto(1);
     setupFoto(2);
+    setupFoto(3);
+    setupFoto(4);
 
 // ----- LOGO EDITÁVEL (IMAGEM) -----
 const inputLogo = document.getElementById('inputLogo');
@@ -2416,26 +2443,19 @@ inputLogoLink.addEventListener('keypress', function(e) {
 
 }); // <--- FIM DO DOMContentLoaded
 
-// Limpa as duas fotos
-const preview1 = document.getElementById('previewFoto1');
-const preview2 = document.getElementById('previewFoto2');
-const inputFoto1 = document.getElementById('inputFoto1');
-const inputFoto2 = document.getElementById('inputFoto2');
-const btnRemover1 = document.getElementById('btnRemoverFoto1');
-const btnRemover2 = document.getElementById('btnRemoverFoto2');
-
-if (preview1) {
-    preview1.src = '';
-    preview1.style.display = 'none';
+// Limpa as quatro fotos
+for (var f = 1; f <= 4; f++) {
+    var preview = document.getElementById('previewFoto' + f);
+    var inputFoto = document.getElementById('inputFoto' + f);
+    var btnRemover = document.getElementById('btnRemoverFoto' + f);
+    
+    if (preview) {
+        preview.src = '';
+        preview.style.display = 'none';
+    }
+    if (inputFoto) inputFoto.value = '';
+    if (btnRemover) btnRemover.style.display = 'none';
 }
-if (preview2) {
-    preview2.src = '';
-    preview2.style.display = 'none';
-}
-if (inputFoto1) inputFoto1.value = '';
-if (inputFoto2) inputFoto2.value = '';
-if (btnRemover1) btnRemover1.style.display = 'none';
-if (btnRemover2) btnRemover2.style.display = 'none';
         // Placeholders opcionais
         document.getElementById('dataAlerta').value = '';
     });
