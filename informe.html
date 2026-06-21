@@ -946,45 +946,53 @@ const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpR
 
 // ===== NOVA FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS =====
 // ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (VERSÃO CORRIGIDA) =====
+// ===== FUNÇÃO PARA ENVIAR EMAIL COM ANEXOS (VERSÃO POST - CORRIGIDA) =====
 async function enviarEmailComAnexos(destino, assunto, corpo, alertaId, anexos) {
     // Montar os anexos como JSON
     var anexosJson = [];
     if (anexos && anexos.length > 0) {
         for (var i = 0; i < anexos.length; i++) {
-var base64Data = anexos[i].split(',')[1] || anexos[i];
-var tipoImagem = 'image/jpeg';  // Padrão
+            var base64Data = anexos[i].split(',')[1] || anexos[i];
+            var tipoImagem = 'image/jpeg';  // Padrão
 
-// Tenta detectar o tipo real da imagem
-if (anexos[i].startsWith('data:image/webp')) {
-    tipoImagem = 'image/webp';
-} else if (anexos[i].startsWith('data:image/png')) {
-    tipoImagem = 'image/png';
-} else if (anexos[i].startsWith('data:image/gif')) {
-    tipoImagem = 'image/gif';
-}
+            // Tenta detectar o tipo real da imagem
+            if (anexos[i].startsWith('data:image/webp')) {
+                tipoImagem = 'image/webp';
+            } else if (anexos[i].startsWith('data:image/png')) {
+                tipoImagem = 'image/png';
+            } else if (anexos[i].startsWith('data:image/gif')) {
+                tipoImagem = 'image/gif';
+            }
 
-anexosJson.push({
-    base64: base64Data,
-    nome: 'foto_' + (i+1) + '.jpg',
-    tipo: tipoImagem  // ← Agora com o tipo correto!
-});
+            anexosJson.push({
+                base64: base64Data,
+                nome: 'foto_' + (i+1) + '.jpg',
+                tipo: tipoImagem
+            });
         }
     }
     
-    // ===== EXATAMENTE IGUAL AO QUE FUNCIONA NO APP =====
-    const dadosStr = encodeURIComponent(JSON.stringify({
+    // ===== USA POST PARA NÃO ESTOURAR O LIMITE DA URL =====
+    const dadosParaEnviar = {
         destino: destino,
         assunto: assunto,
         corpo: corpo,
         alertaId: alertaId,
         anexos: anexosJson
-    }));
+    };
     
-    const url = `${GOOGLE_API_URL}?acao=enviarEmail&aba=alertas&dados=${dadosStr}`;
+    // Cria um FormData e adiciona os parâmetros
+    const formData = new FormData();
+    formData.append('acao', 'enviarEmail');
+    formData.append('aba', 'alertas');
+    formData.append('dados', JSON.stringify(dadosParaEnviar));
+    
+    const url = GOOGLE_API_URL;
     
     try {
         const response = await fetch(url, {
-            method: 'GET'  // ← USANDO GET (que funciona no APP)
+            method: 'POST',
+            body: formData
         });
         return await response.json();
     } catch (error) {
