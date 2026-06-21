@@ -1713,8 +1713,20 @@ ${listaNomes}
 </html>
 `;
 
-// Enviar email com anexos (USANDO A FUNÇÃO CORRETA)
-const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
+// Coletar as fotos (base64) antes de enviar
+const fotosBase64 = [];
+const foto1 = document.getElementById('previewFoto1');
+const foto2 = document.getElementById('previewFoto2');
+
+if (foto1 && foto1.src && foto1.src.startsWith('data:image')) {
+    fotosBase64.push(foto1.src);
+}
+if (foto2 && foto2.src && foto2.src.startsWith('data:image')) {
+    fotosBase64.push(foto2.src);
+}
+
+// Enviar email com anexos (agora com as fotos!)
+const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, fotosBase64);
         
         if (emailResultado.status === 'sucesso') {
             showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`, 'success');
