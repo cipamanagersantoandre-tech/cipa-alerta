@@ -1120,10 +1120,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btnEnviarSetor').addEventListener('click', enviarParaSetor);
     document.getElementById('btnDevolverAlerta').addEventListener('click', devolverAta);
     
-    document.getElementById('inputCarregarRascunho').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') carregarRascunho();
-    });
-    
     carregarListaRascunhos();
     carregarAta();
 }); // Fim do DOMContentLoaded
