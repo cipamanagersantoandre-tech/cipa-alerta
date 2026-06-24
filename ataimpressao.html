@@ -389,17 +389,22 @@
     body { background: white; padding: 0; }
     #barraSuperior { display: none !important; }
     
-   
-/* Forçar cor verde do título */
-.pagina-impressao > div[style*="background-color: #01b051"] {
-    background-color: #01b051 !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-}
+    /* Forçar impressão das cores de fundo em todos os navegadores */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
     
-.cabecalho-tela {
-    display: none !important;
-}
+    /* Garantir que o título verde apareça e mantenha a cor */
+    .pagina-impressao div[style*="background-color: #01b051"],
+    .pagina-impressao td div[style*="background-color: #01b051"] {
+        background-color: #01b051 !important;
+        color: white !important;
+    }
+    
+    .cabecalho-tela {
+        display: none !important;
+    }
 
     /* Ajuste natural do espaçamento do cabeçalho */
     .pagina-impressao {
@@ -523,10 +528,14 @@
                 <tr>
                     <td colspan="2" style="border: none; padding: 0;">
 
-        <!-- TÍTULO DA ATA -->
-        <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
-            ATA DE REUNIÃO ORDINÁRIA DE CIPA
-        </div>
+        <!-- TÍTULO DA ATA (agora dentro da tabela mãe) -->
+        <tr>
+            <td colspan="2" style="border: none; padding: 0;">
+                <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
+                    ATA DE REUNIÃO ORDINÁRIA DE CIPA
+                </div>
+            </td>
+        </tr>
 
         <!-- TABELA DE DADOS (7 LINHAS) -->
         <table class="tabela-dados">
