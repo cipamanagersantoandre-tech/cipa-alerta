@@ -491,12 +491,23 @@
             <input type="hidden" id="ataId" value="">
         </div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-            <button class="btn-topo btn-topo-cinza" id="btnSalvarRascunho">💾 Salvar Rascunho</button>
-            <div class="grupo-carregar">
-                <span>ID:</span>
-                <input type="text" id="inputCarregarRascunho" placeholder="Digite o ID">
-                <button class="btn-topo btn-topo-roxo" id="btnCarregarRascunho">🔍 Carregar</button>
+            
+            <!-- NOVO BLOCO 1: SALVAR COM NOME -->
+            <div class="grupo-carregar" style="background: white; padding: 3px 3px 3px 10px; border-radius: 4px; display: flex; gap: 4px; align-items: center;">
+                <span style="color: #333; font-size: 12px; font-weight: bold;">Nome:</span>
+                <input type="text" id="inputNomeRascunho" placeholder="Ex: ATA Julho" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; width: 130px;">
+                <button class="btn-topo btn-topo-cinza" id="btnSalvarComNome">💾 Salvar</button>
             </div>
+
+            <!-- NOVO BLOCO 2: SELECIONAR E CARREGAR -->
+            <div class="grupo-carregar" style="background: white; padding: 3px 3px 3px 10px; border-radius: 4px; display: flex; gap: 4px; align-items: center;">
+                <span style="color: #333; font-size: 12px; font-weight: bold;">Carregar:</span>
+                <select id="selectListaRascunhos" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; min-width: 160px;">
+                    <option value="">-- Selecione --</option>
+                </select>
+                <button class="btn-topo btn-topo-roxo" id="btnCarregarSelecionado">🔍 Carregar</button>
+            </div>
+
             <button class="btn-topo btn-topo-azul" id="btnEnviarSetor">📤 Enviar para o Setor</button>
             <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver Alerta</button>
             <button class="btn-topo btn-topo-branco" id="btnImprimirTopo">🖨️ Imprimir</button>
