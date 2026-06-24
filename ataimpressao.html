@@ -461,27 +461,21 @@
 @page { 
     size: A4; 
     margin: 8mm;
-    margin-top: 2.5cm;
 }
 
 .cabecalho-impressao {
     display: block;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1.8cm;
-    padding: 0.3cm 8mm 0.2cm 8mm;
+    top: 8mm;
+    left: 8mm;
+    right: 8mm;
+    height: auto;
     background: white;
-    z-index: 1000;
+    padding-bottom: 5mm;
 }
 
 .pagina-impressao {
-    width: 100%;
-    min-height: auto;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
+    padding-top: 3cm;
 }
 
 .cabecalho-impressao {
@@ -542,6 +536,11 @@
                 </td>
             </tr>
         </table>
+    <!-- CABEÇALHO -->
+    <div class="cabecalho-impressao">
+        <table>...</table>
+        <hr>
+    </div>
 
         <!-- TÍTULO DA ATA -->
         <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
