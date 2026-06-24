@@ -518,6 +518,41 @@
     <!-- PÁGINA DE IMPRESSÃO -->
     <div class="pagina-impressao">
 
+<!-- COLE O MODAL AQUI (LOGO DEPOIS DA PÁGINA DE IMPRESSÃO) -->
+<div id="modalEnviarSetor" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: white; border-radius: 8px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        
+        <!-- Cabeçalho do Modal -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem;">
+            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;" id="tituloModalEnvio">📤 Enviar ATA para o Setor</h2>
+            <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
+        </div>
+
+        <!-- Select de Setores -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Setor destinatário:</label>
+            <select id="selectSetorEnvio" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                <option value="">-- Selecione um setor --</option>
+            </select>
+        </div>
+
+        <!-- Lista de Destinatários -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Destinatários:</label>
+            <div id="listaDestinatarios" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; min-height: 70px; max-height: 200px; overflow-y: auto; background: #f9fafb;">
+                <span style="color: #6b7280; font-size: 13px;">Selecione um setor ou adicione manualmente</span>
+            </div>
+            <button onclick="adicionarDestinatarioManual()" style="margin-top: 8px; background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;">+ Adicionar destinatário</button>
+        </div>
+
+        <!-- Botões -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+            <button onclick="fecharModalEnviar()" style="background: #6c757d; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancelar</button>
+            <button id="btnConfirmarEnvio" style="background: #2563eb; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">📤 Enviar Agora</button>
+        </div>
+    </div>
+</div>
+
         <!-- INÍCIO DA TABELA MÃE (para repetir o cabeçalho em todas as páginas) -->
         <table style="width: 100%; border-collapse: collapse; border: none;">
             <thead style="display: table-header-group;">
@@ -1523,40 +1558,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     carregarSetores();
 }); // Fim do DOMContentLoaded
-
-<div id="modalEnviarSetor" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
-    <div style="background: white; border-radius: 8px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        
-        <!-- Cabeçalho do Modal -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem;">
-            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;" id="tituloModalEnvio">📤 Enviar ATA para o Setor</h2>
-            <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
-        </div>
-
-        <!-- Select de Setores -->
-        <div style="margin-bottom: 1rem;">
-            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Setor destinatário:</label>
-            <select id="selectSetorEnvio" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
-                <option value="">-- Selecione um setor --</option>
-            </select>
-        </div>
-
-        <!-- Lista de Destinatários -->
-        <div style="margin-bottom: 1rem;">
-            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Destinatários:</label>
-            <div id="listaDestinatarios" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; min-height: 70px; max-height: 200px; overflow-y: auto; background: #f9fafb;">
-                <span style="color: #6b7280; font-size: 13px;">Selecione um setor ou adicione manualmente</span>
-            </div>
-            <button onclick="adicionarDestinatarioManual()" style="margin-top: 8px; background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;">+ Adicionar destinatário</button>
-        </div>
-
-        <!-- Botões -->
-        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
-            <button onclick="fecharModalEnviar()" style="background: #6c757d; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancelar</button>
-            <button id="btnConfirmarEnvio" style="background: #2563eb; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">📤 Enviar Agora</button>
-        </div>
-    </div>
-</div>
 
 </script>
 </body>
