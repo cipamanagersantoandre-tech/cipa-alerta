@@ -464,8 +464,24 @@
     margin-top: 2.5cm;
 }
 
-@page :first {
-    margin-top: 8mm;
+.cabecalho-impressao {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.8cm;
+    padding: 0.3cm 8mm 0.2cm 8mm;
+    background: white;
+    z-index: 1000;
+}
+
+.pagina-impressao {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
 }
 
 .cabecalho-impressao {
