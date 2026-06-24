@@ -676,11 +676,312 @@
 </div>
 </div>
 
+<!-- PAINEL DE CONFIGURAÇÕES DE SETORES E EMAILS (NÃO IMPRIME) -->
+<div id="painelSetores" style="display: none; background: #f0f2f5; padding: 15px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #d0d7de;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h4 style="margin: 0; color: #1e466e;">📋 Cadastro de Setores e E-mails</h4>
+        <button id="btnFecharSetores" style="background: #c55a11; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer;">✕ Fechar</button>
+    </div>
+    
+    <div style="margin-top: 10px;">
+        <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Adicionar Novo Setor</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" id="novoSetorNome" placeholder="Nome do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <input type="email" id="novoSetorEmail" placeholder="E-mail do setor" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 150px;">
+            <button id="btnAdicionarSetorConfig" style="background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer;">+ Adicionar</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 15px;">
+        <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 4px;">Setores Cadastrados:</label>
+        <div id="listaSetoresConfig" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;"></div>
+    </div>
+</div>
+
+// ===== VARIÁVEIS E FUNÇÕES DO MODAL DE ENVIO =====
+let destinatarios = [];
+
+// Abrir modal
+function abrirModalEnvio(tipo) {
+    const modal = document.getElementById('modalEnviarSetor');
+    modal.style.display = 'flex';
+    
+    const titulo = document.getElementById('tituloModalEnvio');
+    const btnEnviar = document.getElementById('btnConfirmarEnvio');
+    
+    if (tipo === 'devolver') {
+        titulo.textContent = '📤 Devolver ATA';
+        btnEnviar.style.background = '#c55a11';
+        btnEnviar.textContent = '📤 Devolver Agora';
+    } else {
+        titulo.textContent = '📤 Enviar ATA para o Setor';
+        btnEnviar.style.background = '#2563eb';
+        btnEnviar.textContent = '📤 Enviar Agora';
+    }
+    
+    carregarSetoresEnvio();
+    destinatarios = [];
+    atualizarListaDestinatarios();
+}
+
+// Fechar modal
+function fecharModalEnviar() {
+    document.getElementById('modalEnviarSetor').style.display = 'none';
+}
+
+// Carregar setores no select do modal
+async function carregarSetoresEnvio() {
+    const select = document.getElementById('selectSetorEnvio');
+    if (!select) return;
+    
+    select.innerHTML = '<option value="">-- Selecione um setor --</option>';
+    
+    try {
+        const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=${ABA_SETORES}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.status === 'sucesso' && result.dados) {
+            result.dados.forEach(item => {
+                try {
+                    const dados = JSON.parse(item.dados);
+                    if (dados && dados.nome && dados.email) {
+                        const option = document.createElement('option');
+                        option.value = dados.email;
+                        option.textContent = dados.nome + ' (' + dados.email + ')';
+                        option.dataset.nome = dados.nome;
+                        option.dataset.email = dados.email;
+                        select.appendChild(option);
+                    }
+                } catch (e) {}
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar setores:', error);
+    }
+}
+
+// Adicionar destinatário manual
+function adicionarDestinatarioManual() {
+    const email = prompt('Digite o email do destinatário:');
+    if (email && email.trim()) {
+        if (!email.includes('@')) {
+            alert('❌ Email inválido!');
+            return;
+        }
+        destinatarios.push({ email: email.trim(), nome: '' });
+        atualizarListaDestinatarios();
+    }
+}
+
+// Atualizar lista de destinatários na tela
+function atualizarListaDestinatarios() {
+    const container = document.getElementById('listaDestinatarios');
+    if (!container) return;
+    
+    if (destinatarios.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Selecione um setor ou adicione manualmente</span>';
+        return;
+    }
+    
+    container.innerHTML = destinatarios.map((d, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: #dbeafe; border-radius: 4px; margin-bottom: 4px;">
+            <span style="font-size: 14px;">${d.nome ? d.nome + ' - ' : ''}<strong>${d.email}</strong></span>
+            <button onclick="removerDestinatario(${i})" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 4px;">✕</button>
+        </div>
+    `).join('');
+}
+
+// Remover destinatário
+function removerDestinatario(index) {
+    destinatarios.splice(index, 1);
+    atualizarListaDestinatarios();
+}
+
+// ===== EVENTOS DO MODAL =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Quando selecionar um setor, adiciona os emails
+    const selectSetorEnvio = document.getElementById('selectSetorEnvio');
+    if (selectSetorEnvio) {
+        selectSetorEnvio.addEventListener('change', function() {
+            const email = this.value;
+            const nome = this.options[this.selectedIndex]?.dataset?.nome || '';
+            
+            if (!email) return;
+            
+            if (!destinatarios.some(d => d.email === email)) {
+                destinatarios.push({ email: email, nome: nome });
+                atualizarListaDestinatarios();
+            }
+            this.value = '';
+        });
+    }
+    
+    // Botão confirmar envio
+    const btnConfirmar = document.getElementById('btnConfirmarEnvio');
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', enviarParaSetorModal);
+    }
+});
+        
+        <!-- Cabeçalho do Modal -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 1rem;">
+            <h2 style="color: #1e466e; margin: 0; font-size: 1.5rem;" id="tituloModalEnvio">📤 Enviar ATA para o Setor</h2>
+            <button onclick="fecharModalEnviar()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #6b7280; padding: 0 8px;">✕</button>
+        </div>
+
+        <!-- Select de Setores -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Setor destinatário:</label>
+            <select id="selectSetorEnvio" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                <option value="">-- Selecione um setor --</option>
+            </select>
+        </div>
+
+        <!-- Lista de Destinatários -->
+        <div style="margin-bottom: 1rem;">
+            <label style="font-weight: bold; display: block; margin-bottom: 6px; font-size: 14px; color: #374151;">Destinatários:</label>
+            <div id="listaDestinatarios" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; min-height: 70px; max-height: 200px; overflow-y: auto; background: #f9fafb;">
+                <span style="color: #6b7280; font-size: 13px;">Selecione um setor ou adicione manualmente</span>
+            </div>
+            <button onclick="adicionarDestinatarioManual()" style="margin-top: 8px; background: #1e466e; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 13px;">+ Adicionar destinatário</button>
+        </div>
+
+        <!-- Botões -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+            <button onclick="fecharModalEnviar()" style="background: #6c757d; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">Cancelar</button>
+            <button id="btnConfirmarEnvio" style="background: #2563eb; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">📤 Enviar Agora</button>
+        </div>
+    </div>
+</div>
+
 <script>
 
 // ===== CONFIGURAÇÕES =====
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
 const ABA_PLANILHA = 'ata';
+
+// ===== FUNÇÕES DE SETORES E EMAILS (COMPARTILHADAS COM O APP INFORME) =====
+const ABA_SETORES = 'setores';
+
+// Função para carregar os setores da planilha
+async function carregarSetores() {
+    try {
+        const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=${ABA_SETORES}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        let setores = [];
+        if (result.status === 'sucesso' && result.dados) {
+            setores = result.dados
+                .map(item => {
+                    try { return JSON.parse(item.dados); }
+                    catch (e) { return null; }
+                })
+                .filter(item => item !== null);
+        }
+        
+        renderizarSetoresConfig(setores);
+        return setores;
+    } catch (e) {
+        console.error('Erro ao carregar setores:', e);
+        return [];
+    }
+}
+
+// Função para renderizar a lista de setores no painel
+function renderizarSetoresConfig(setores) {
+    const container = document.getElementById('listaSetoresConfig');
+    if (!container) return;
+    
+    if (!setores || setores.length === 0) {
+        container.innerHTML = '<span style="color: #6b7280; font-size: 13px;">Nenhum setor cadastrado</span>';
+        return;
+    }
+    
+    container.innerHTML = setores.map(s => `
+        <span class="setor-item-config" data-id="${s.id}" style="background: #dbeafe; padding: 4px 12px; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px;">
+            ${s.nome} (${s.email})
+            <button class="btn-remover-setor-config" data-id="${s.id}" style="background: none; border: none; color: #991b1b; cursor: pointer; font-weight: bold; font-size: 16px;">×</button>
+        </span>
+    `).join('');
+    
+    // Adicionar evento de remoção
+    document.querySelectorAll('.btn-remover-setor-config').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            removerSetor(id);
+        });
+    });
+}
+
+// Função para adicionar um novo setor
+async function adicionarSetorConfig() {
+    const nome = document.getElementById('novoSetorNome').value.trim();
+    const email = document.getElementById('novoSetorEmail').value.trim();
+    
+    if (!nome) {
+        showAlert('❌ Digite o nome do setor!');
+        return;
+    }
+    if (!email) {
+        showAlert('❌ Digite o e-mail do setor!');
+        return;
+    }
+    
+    const botao = document.getElementById('btnAdicionarSetorConfig');
+    const textoOriginal = botao.textContent;
+    botao.disabled = true;
+    botao.textContent = '⏳ Adicionando...';
+    
+    const id = 'SETOR-' + Date.now().toString(36).toUpperCase();
+    const novoSetor = { id, nome, email };
+    const dadosStr = encodeURIComponent(JSON.stringify(novoSetor));
+    
+    try {
+        const response = await fetch(
+            `${GOOGLE_API_URL}?acao=salvar&aba=${ABA_SETORES}&id=${encodeURIComponent(id)}&dados=${dadosStr}`
+        );
+        const result = await response.json();
+        
+        if (result.status === 'sucesso') {
+            document.getElementById('novoSetorNome').value = '';
+            document.getElementById('novoSetorEmail').value = '';
+            showAlert('✅ Setor adicionado com sucesso!');
+            await carregarSetores();
+        } else {
+            showAlert('❌ Erro ao salvar: ' + result.mensagem);
+        }
+    } catch (e) {
+        console.error('Erro ao adicionar setor:', e);
+        showAlert('❌ Erro de conexão ao adicionar setor');
+    } finally {
+        botao.disabled = false;
+        botao.textContent = textoOriginal;
+    }
+}
+
+// Função para remover um setor
+async function removerSetor(id) {
+    if (!confirm('Remover este setor permanentemente?')) return;
+    
+    try {
+        const response = await fetch(
+            `${GOOGLE_API_URL}?acao=excluir&aba=${ABA_SETORES}&id=${encodeURIComponent(id)}`
+        );
+        const result = await response.json();
+        
+        if (result.status === 'sucesso') {
+            showAlert('✅ Setor removido!');
+            await carregarSetores();
+        } else {
+            showAlert('❌ Erro ao remover: ' + result.mensagem);
+        }
+    } catch (e) {
+        console.error('Erro ao remover setor:', e);
+        showAlert('❌ Erro de conexão ao remover setor');
+    }
+}
 
 // ===== VARIÁVEIS DE SIM/NÃO =====
 let desligamentoSim = false;
@@ -927,27 +1228,27 @@ async function carregarRascunho() {
     }
 }
 
-// ===== ENVIAR PARA O SETOR =====
-async function enviarParaSetor() {
-    const ataId = document.getElementById('ataId').value;
+// ===== ENVIAR PELO MODAL =====
+async function enviarParaSetorModal() {
+    if (destinatarios.length === 0) {
+        showAlert('❌ Adicione pelo menos um destinatário!');
+        return;
+    }
     
+    const ataId = document.getElementById('ataId').value;
     if (!ataId) {
-        const novoId = 'ATA-' + Date.now().toString(36).toUpperCase();
-        document.getElementById('ataId').value = novoId;
-        document.getElementById('ataIdDisplay').textContent = 'ID: ' + novoId;
+        showAlert('❌ ID da ata não encontrado! Salve primeiro.');
+        return;
     }
     
     const idAtual = document.getElementById('ataId').value;
     const dados = coletarDados();
-    dados.status = 'Enviado';
+    const tituloModal = document.getElementById('tituloModalEnvio').textContent;
+    const isDevolver = tituloModal.includes('Devolver');
+    dados.status = isDevolver ? 'Respondido' : 'Enviado';
     dados.dataEnvio = new Date().toISOString();
     
-    if (!dados.unidade || !dados.dataRealizacao || !dados.numEmpregados) {
-        showAlert('❌ Preencha os campos obrigatórios: Unidade, Data e Nº de empregados!');
-        return;
-    }
-    
-    const btn = document.getElementById('btnEnviarSetor');
+    const btn = document.getElementById('btnConfirmarEnvio');
     const textoOriginal = btn.textContent;
     btn.disabled = true;
     btn.textContent = '⏳ Enviando...';
@@ -961,16 +1262,12 @@ async function enviarParaSetor() {
             return;
         }
         
-        atualizarStatus('Enviado');
+        atualizarStatus(dados.status);
         
-        const destinatario = prompt('Digite o email do destinatário:');
-        if (!destinatario) {
-            btn.disabled = false;
-            btn.textContent = textoOriginal;
-            return;
-        }
-        
-        const assunto = `📋 ATA de Reunião CIPA - ${dados.unidade} - ${dados.dataRealizacao}`;
+        const emails = destinatarios.map(d => d.email).join(',');
+        const assunto = isDevolver 
+            ? `✅ ATA Respondida - ${dados.unidade} - ${dados.dataRealizacao}`
+            : `📋 ATA de Reunião CIPA - ${dados.unidade} - ${dados.dataRealizacao}`;
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
         
         const corpo = `
@@ -1003,10 +1300,11 @@ Gerente: ${dados.nomeGerente || 'Não informado'}
 Link para visualizar: ${link}
         `;
         
-        const emailResultado = await enviarEmailComAnexos(destinatario, assunto, corpo, idAtual, []);
+        const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
         
         if (emailResultado.status === 'sucesso') {
-            showAlert(`📧 Email enviado para ${destinatario}!`);
+            showAlert(`📧 Email enviado para ${destinatarios.length} destinatário(s)!`);
+            fecharModalEnviar();
         } else {
             showAlert('⚠️ Ata salva, mas erro ao enviar email: ' + emailResultado.mensagem);
         }
@@ -1120,17 +1418,6 @@ async function carregarAta() {
     }
 }
 
-// ===== EVENT LISTENERS =====
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btnSalvarComNome').addEventListener('click', salvarRascunho);
-    document.getElementById('btnCarregarSelecionado').addEventListener('click', carregarRascunhoSelecionado);
-    document.getElementById('btnEnviarSetor').addEventListener('click', enviarParaSetor);
-    document.getElementById('btnDevolverAlerta').addEventListener('click', devolverAta);
-    
-    carregarListaRascunhos();
-    carregarAta();
-}); // Fim do DOMContentLoaded
-
 // 1. Função para buscar a lista de todos os rascunhos na planilha e preencher o menu
 async function carregarListaRascunhos() {
     const select = document.getElementById('selectListaRascunhos');
@@ -1222,6 +1509,49 @@ async function carregarRascunhoSelecionado() {
         btn.disabled = false;
     }
 }
+
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnSalvarComNome').addEventListener('click', salvarRascunho);
+    document.getElementById('btnCarregarSelecionado').addEventListener('click', carregarRascunhoSelecionado);
+    document.getElementById('btnEnviarSetor').addEventListener('click', function() {
+        abrirModalEnvio('enviar');
+    });
+    document.getElementById('btnDevolverAlerta').addEventListener('click', function() {
+        abrirModalEnvio('devolver');
+    });
+    
+    carregarListaRascunhos();
+    carregarAta();
+    
+    // ===== CONFIGURAÇÕES DE SETORES =====
+    const btnConfig = document.getElementById('btnConfiguracoes');
+    if (btnConfig) {
+        btnConfig.addEventListener('click', function() {
+            const painel = document.getElementById('painelSetores');
+            if (painel.style.display === 'none') {
+                painel.style.display = 'block';
+                carregarSetores();
+            } else {
+                painel.style.display = 'none';
+            }
+        });
+    }
+    
+    const btnFechar = document.getElementById('btnFecharSetores');
+    if (btnFechar) {
+        btnFechar.addEventListener('click', function() {
+            document.getElementById('painelSetores').style.display = 'none';
+        });
+    }
+    
+    const btnAdicionarSetorConfig = document.getElementById('btnAdicionarSetorConfig');
+    if (btnAdicionarSetorConfig) {
+        btnAdicionarSetorConfig.addEventListener('click', adicionarSetorConfig);
+    }
+    
+    carregarSetores();
+}); // Fim do DOMContentLoaded
 
 </script>
 
