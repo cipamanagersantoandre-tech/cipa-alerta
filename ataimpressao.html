@@ -844,23 +844,32 @@ function showAlert(message) {
 // ===== SALVAR E CARREGAR RASCUNHO =====
 async function salvarRascunho() {
     const ataId = document.getElementById('ataId').value;
+    const nomeRascunho = document.getElementById('inputNomeRascunho').value.trim();
+    
+    if (!nomeRascunho) {
+        showAlert('❌ Por favor, digite um nome para o rascunho (ex: ATA Julho)!');
+        return;
+    }
     
     if (!ataId) {
         const novoId = 'ATA-' + Date.now().toString(36).toUpperCase();
         document.getElementById('ataId').value = novoId;
         document.getElementById('ataIdDisplay').textContent = 'ID: ' + novoId;
-        showAlert('🆔 Novo ID gerado: ' + novoId);
     }
     
     const idAtual = document.getElementById('ataId').value;
     const dados = coletarDados();
     dados.status = 'Rascunho';
+    dados.nome_rascunho = nomeRascunho; // <--- AQUI ADICIONAMOS O NOME
     
     try {
         const resultado = await salvarAtaNaPlanilha(idAtual, dados);
         if (resultado.status === 'sucesso') {
             atualizarStatus('Rascunho');
-            showAlert('✅ Rascunho salvo! ID: ' + idAtual);
+            showAlert('✅ Rascunho "' + nomeRascunho + '" salvo! ID: ' + idAtual);
+            document.getElementById('inputNomeRascunho').value = ''; // Limpa o campo
+            // Depois de salvar, já vamos atualizar a lista de rascunhos
+            await carregarListaRascunhos();
         } else {
             showAlert('❌ Erro ao salvar: ' + resultado.mensagem);
         }
@@ -1106,10 +1115,15 @@ async function carregarAta() {
 
 // ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btnSalvarRascunho').addEventListener('click', salvarRascunho);
-    document.getElementById('btnCarregarRascunho').addEventListener('click', carregarRascunho);
+    document.getElementById('btnSalvarComNome').addEventListener('click', salvarRascunho); // <-- Novo botão
+    document.getElementById('btnCarregarSelecionado').addEventListener('click', carregarRascunhoSelecionado); // <-- Novo botão (vamos criar essa função no próximo passo)
     document.getElementById('btnEnviarSetor').addEventListener('click', enviarParaSetor);
     document.getElementById('btnDevolverAlerta').addEventListener('click', devolverAta);
+    
+    // Carrega a lista de rascunhos assim que a página abrir
+    carregarListaRascunhos();
+    carregarAta();
+});
     
     document.getElementById('inputCarregarRascunho').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') carregarRascunho();
