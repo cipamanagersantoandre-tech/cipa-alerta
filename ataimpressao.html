@@ -1129,8 +1129,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') carregarRascunho();
     });
     
-    carregarAta();
-});
+    // Já chamamos carregarAta() dentro do evento acima, então não precisa chamar aqui fora novamente.
+}); // Fechamento correto do DOMContentLoaded
 
 // ===== NOVAS FUNÇÕES PARA LISTAR E CARREGAR RASCUNHOS PELO NOME =====
 
