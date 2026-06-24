@@ -852,7 +852,14 @@ async function salvarRascunho() {
     }
     
     if (!ataId) {
-        const novoId = 'ATA-' + Date.now().toString(36).toUpperCase();
+        // Pega o nome que você digitou, remove espaços e transforma em maiúsculas
+        let nomeId = nomeRascunho.trim().toUpperCase().replace(/\s+/g, '-');
+        // Se o nome tiver caracteres especiais, remove eles (deixa só letras, números e traços)
+        nomeId = nomeId.replace(/[^A-Z0-9-]/g, '');
+        // Se o nome ficar vazio, usa um fallback
+        if (!nomeId) nomeId = 'ATA';
+        
+        const novoId = nomeId + '-' + Date.now().toString(36).toUpperCase();
         document.getElementById('ataId').value = novoId;
         document.getElementById('ataIdDisplay').textContent = 'ID: ' + novoId;
     }
