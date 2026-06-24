@@ -95,12 +95,13 @@
         }
         
 .pagina-impressao {
-    width: 100%;
-    min-height: auto;
-    margin: 0;
-    padding: 0;
-    padding-top: 2cm;
-    box-shadow: none;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 5mm;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    color: #000;
 }
         
 
@@ -459,7 +460,8 @@
 
 @page { 
     size: A4; 
-    margin: 8mm;
+    margin: 3mm;
+    margin-top: 1.8cm;
 }
 
 .cabecalho-impressao {
@@ -469,7 +471,7 @@
     left: 0;
     right: 0;
     height: 1.4cm;
-    padding: 0.3cm 8mm 0.1cm 8mm;
+    padding: 0.2cm 3mm 0 3mm;
     background: white;
     z-index: 1000;
 }
