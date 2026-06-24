@@ -95,14 +95,13 @@
         }
         
 .pagina-impressao {
-    width: 100%;
-    min-height: auto;
-    margin: 0;
-    padding-top: 2.2cm;
-    padding-left: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    box-shadow: none;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 5mm;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    color: #000;
 }
         
 
@@ -461,8 +460,20 @@
 
 @page { 
     size: A4; 
-    margin: 8mm;
-    margin-top: 2.5cm;
+    margin: 3mm;
+    margin-top: 1.8cm;
+}
+
+.cabecalho-impressao {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.4cm;
+    padding: 0.2cm 3mm 0 3mm;
+    background: white;
+    z-index: 1000;
 }
 
 }
@@ -650,7 +661,7 @@
 </div>
 
 <!-- CABEÇALHO REPETIDO EM TODAS AS PÁGINAS NA IMPRESSÃO -->
-
+<div class="cabecalho-impressao">
     <table style="width: 100%; border: none; margin: 0;">
         <tr>
             <td style="width: 20%; text-align: left; vertical-align: middle; border: none; padding: 0;">
