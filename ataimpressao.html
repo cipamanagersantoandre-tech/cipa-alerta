@@ -1131,6 +1131,89 @@ document.addEventListener('DOMContentLoaded', function() {
     
     carregarAta();
 });
+
+// ===== NOVAS FUNÇÕES PARA LISTAR E CARREGAR RASCUNHOS PELO NOME =====
+
+// 1. Função para buscar a lista de todos os rascunhos na planilha e preencher o menu
+async function carregarListaRascunhos() {
+    const select = document.getElementById('selectListaRascunhos');
+    
+    // Mostra que está carregando
+    select.innerHTML = '<option value="">⏳ Carregando...</option>';
+    
+    try {
+        // Faz uma requisição especial para o script pedindo a lista de IDs e Nomes
+        const url = `${GOOGLE_API_URL}?acao=listar&aba=${ABA_PLANILHA}`;
+        const response = await fetch(url);
+        const resultado = await response.json();
+        
+        // Limpa o menu
+        select.innerHTML = '<option value="">-- Selecione --</option>';
+        
+        if (resultado.status === 'sucesso' && resultado.lista && resultado.lista.length > 0) {
+            // Preenche o menu com os nomes encontrados
+            resultado.lista.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id; // Guarda o ID no valor da opção
+                // Mostra o Nome no texto. Se não tiver nome, mostra o ID
+                const nomeExibicao = item.nome_rascunho ? item.nome_rascunho : item.id;
+                option.textContent = nomeExibicao + ' (' + item.id + ')';
+                select.appendChild(option);
+            });
+        } else {
+            // Se não tiver nenhum rascunho salvo ainda
+            select.innerHTML = '<option value="">Nenhum rascunho salvo</option>';
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar lista:', error);
+        select.innerHTML = '<option value="">Erro ao carregar</option>';
+    }
+}
+
+// 2. Função para carregar o rascunho selecionado no menu
+async function carregarRascunhoSelecionado() {
+    const select = document.getElementById('selectListaRascunhos');
+    const idSelecionado = select.value;
+    
+    if (!idSelecionado) {
+        showAlert('❌ Selecione um rascunho na lista!');
+        return;
+    }
+    
+    const btn = document.getElementById('btnCarregarSelecionado');
+    const textoOriginal = btn.textContent;
+    btn.textContent = '⏳ Carregando...';
+    btn.disabled = true;
+    
+    try {
+        // Reutiliza a função que já existe para carregar os dados pelo ID
+        const dados = await carregarAtaDaPlanilha(idSelecionado);
+        
+        if (!dados) {
+            showAlert('❌ Erro ao carregar os dados do rascunho selecionado.');
+            btn.textContent = textoOriginal;
+            btn.disabled = false;
+            return;
+        }
+        
+        // Preenche os campos
+        document.getElementById('ataId').value = idSelecionado;
+        document.getElementById('ataIdDisplay').textContent = 'ID: ' + idSelecionado;
+        preencherCampos(dados);
+        atualizarStatus(dados.status || 'Rascunho');
+        
+        showAlert('✅ Rascunho carregado com sucesso!');
+        
+    } catch (error) {
+        console.error('Erro ao carregar rascunho selecionado:', error);
+        showAlert('❌ Erro ao carregar rascunho');
+    } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+    }
+}
+
 </script>
 
 </body>
