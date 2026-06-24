@@ -683,6 +683,8 @@
     <hr style="border: none; border-top: 1px solid #808080; margin: 2px 0 0 0;">
 </div>
 
+
+
 <script>
 
 // ===== CONFIGURAÇÕES =====
@@ -692,6 +694,24 @@ const ABA_PLANILHA = 'ata';
 // ===== VARIÁVEIS DE SIM/NÃO =====
 let desligamentoSim = false;
 let acidenteSim = false;
+
+// Forçar espaço no topo para impressão a partir da página 2
+window.addEventListener('beforeprint', function() {
+    // Criar elemento empurrador
+    var empurrador = document.createElement('div');
+    empurrador.id = 'empurrador-print';
+    empurrador.style.cssText = 'height: 2.5cm; display: block;';
+    
+    // Inserir no começo da pagina-impressao
+    var pagina = document.querySelector('.pagina-impressao');
+    pagina.insertBefore(empurrador, pagina.firstChild);
+});
+
+window.addEventListener('afterprint', function() {
+    // Remover empurrador após imprimir
+    var empurrador = document.getElementById('empurrador-print');
+    if (empurrador) empurrador.remove();
+});
 
 // ===== TOGGLE SIM/NÃO =====
 function toggleDesligamento() {
