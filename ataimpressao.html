@@ -501,25 +501,27 @@
     <!-- PÁGINA DE IMPRESSÃO -->
     <div class="pagina-impressao">
 
-        <!-- CABEÇALHO (REPETIDO AUTOMATICAMENTE NA IMPRESSÃO) -->
-        <table style="width: 100%; border: none; margin: 0; padding: 0; display: table; margin-bottom: 15px;">
+        <!-- INÍCIO DA TABELA MÃE (para repetir o cabeçalho em todas as páginas) -->
+        <table style="width: 100%; border-collapse: collapse; border: none;">
             <thead style="display: table-header-group;">
                 <tr>
-                    <td style="width: 25%; text-align: left; vertical-align: middle; border: none; padding: 0 0 5px 0;">
+                    <td style="width: 25%; text-align: left; vertical-align: middle; border: none; padding-bottom: 5px;">
                         <img src="https://lh3.googleusercontent.com/d/1IxAvEHlQ6RqYpt5FLPSwXf08g4yqqWFp" 
                              id="logoImagem"
                              style="max-width: 90px; max-height: 80px; filter: grayscale(100%); opacity: 0.8;">
                     </td>
-                    <td style="width: 75%; text-align: right; vertical-align: middle; border: none; padding: 0 0 5px 0;">
+                    <td style="width: 75%; text-align: right; vertical-align: middle; border: none; padding-bottom: 5px;">
                         <div style="font-size: 14px; font-weight: bold; color: #808080;">SERVIÇO SOCIAL DO COMÉRCIO</div>
                         <div style="font-size: 11px; color: #808080;">Administração Regional do Estado de São Paulo</div>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="border-bottom: 1px solid #808080; padding: 0 0 5px 0;"></td>
+                    <td colspan="2" style="border-bottom: 1px solid #808080; padding-bottom: 10px;"></td>
                 </tr>
             </thead>
-        </table>
+            <tbody>
+                <tr>
+                    <td colspan="2" style="border: none; padding: 0;">
 
         <!-- TÍTULO DA ATA -->
         <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
