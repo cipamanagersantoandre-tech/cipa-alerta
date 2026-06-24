@@ -1133,14 +1133,16 @@ async function carregarListaRascunhos() {
     
     try {
         // Faz uma requisição especial para o script pedindo a lista de IDs e Nomes
-        const url = `${GOOGLE_API_URL}?acao=listar&aba=${ABA_PLANILHA}`;
+        const url = `${GOOGLE_API_URL}?acao=carregarTudo&aba=${ABA_PLANILHA}`;
         const response = await fetch(url);
         const resultado = await response.json();
         
         // Limpa o menu
         select.innerHTML = '<option value="">-- Selecione --</option>';
         
-        if (resultado.status === 'sucesso' && resultado.lista && resultado.lista.length > 0) {
+        if (resultado.status === 'sucesso' && resultado.dados && resultado.dados.length > 0) {
+            // Preenche o menu com os nomes encontrados
+            resultado.dados.forEach(item => {
             // Preenche o menu com os nomes encontrados
             resultado.lista.forEach(item => {
                 const option = document.createElement('option');
