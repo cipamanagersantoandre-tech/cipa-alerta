@@ -527,18 +527,14 @@
             <tbody>
                 <tr>
                     <td colspan="2" style="border: none; padding: 0;">
+                        
+                        <!-- TÍTULO DA ATA (DENTRO DA MESMA CÉLULA) -->
+                        <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
+                            ATA DE REUNIÃO ORDINÁRIA DE CIPA
+                        </div>
 
-        <!-- TÍTULO DA ATA (agora dentro da tabela mãe) -->
-        <tr>
-            <td colspan="2" style="border: none; padding: 0;">
-                <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
-                    ATA DE REUNIÃO ORDINÁRIA DE CIPA
-                </div>
-            </td>
-        </tr>
-
-        <!-- TABELA DE DADOS (7 LINHAS) -->
-        <table class="tabela-dados">
+                        <!-- AQUI COMEÇA A TABELA DE DADOS (AGORA TUDO DENTRO DA MESMA CÉLULA) -->
+                        <table class="tabela-dados" style="margin-top: 0;">
             <tr>
                 <td class="coluna-esquerda">UNIDADE OPERACIONAL (ESTABELECIMENTO)</td>
                 <td class="coluna-direita"><input type="text" id="unidade" placeholder="Ex: SESC SANTO ANDRÉ"></td>
