@@ -95,13 +95,12 @@
         }
         
 .pagina-impressao {
-    width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto;
-    padding: 5mm;
-    background: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    color: #000;
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    padding-top: 2cm;
+    box-shadow: none;
 }
         
 
@@ -460,27 +459,7 @@
 
 @page { 
     size: A4; 
-    margin-left: 8mm;
-    margin-right: 8mm;
-    margin-bottom: 8mm;
-    margin-top: 3cm;
-}
-
-.cabecalho-impressao {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2.2cm;
-    padding: 0.3cm 8mm;
-    background: white;
-    border-bottom: 1px solid #808080;
-}
-
-.pagina-impressao {
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
+    margin: 8mm;
 }
 
 .cabecalho-impressao {
@@ -490,7 +469,7 @@
     left: 0;
     right: 0;
     height: 1.4cm;
-    padding: 0.2cm 3mm 0 3mm;
+    padding: 0.3cm 8mm 0.1cm 8mm;
     background: white;
     z-index: 1000;
 }
@@ -541,11 +520,6 @@
                 </td>
             </tr>
         </table>
-    <!-- CABEÇALHO -->
-    <div class="cabecalho-impressao">
-        <table>...</table>
-        <hr>
-    </div>
 
         <!-- TÍTULO DA ATA -->
         <div style="background-color: #01b051; color: white; text-align: center; padding: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px;">
