@@ -1143,12 +1143,22 @@ async function carregarListaRascunhos() {
         if (resultado.status === 'sucesso' && resultado.dados && resultado.dados.length > 0) {
             // Preenche o menu com os nomes encontrados
             resultado.dados.forEach(item => {
-            // Preenche o menu com os nomes encontrados
-            resultado.lista.forEach(item => {
                 const option = document.createElement('option');
                 option.value = item.id; // Guarda o ID no valor da opção
-                // Mostra o Nome no texto. Se não tiver nome, mostra o ID
-                const nomeExibicao = item.nome_rascunho ? item.nome_rascunho : item.id;
+                
+                // Verifica se existe um objeto 'dados' com a propriedade nome_rascunho
+                let nomeExibicao = item.id;
+                try {
+                    if (item.dados && typeof item.dados === 'string') {
+                        const dadosParse = JSON.parse(item.dados);
+                        if (dadosParse.nome_rascunho) {
+                            nomeExibicao = dadosParse.nome_rascunho;
+                        }
+                    }
+                } catch (e) {
+                    // Se não conseguir ler, usa o ID
+                }
+                
                 option.textContent = nomeExibicao + ' (' + item.id + ')';
                 select.appendChild(option);
             });
