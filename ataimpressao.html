@@ -1579,6 +1579,10 @@ async function buscarAtaCipaManager() {
 
 // ===== PREENCHER CAMPOS COM OS DADOS DA ATA DO CIPA MANAGER =====
 function preencherCamposAta(dados) {
+    console.log('DADOS COMPLETOS RECEBIDOS:', dados);
+    console.log('SEÇÃO 4 (ACIDENTES):', dados.secao4);
+    console.log('SEÇÃO 5 (ASSUNTOS):', dados.secao5);
+    
     // 1. UNIDADE OPERACIONAL
     if (dados.dadosConfiguracao && dados.dadosConfiguracao.unidade) {
         document.getElementById('unidade').value = dados.dadosConfiguracao.unidade;
