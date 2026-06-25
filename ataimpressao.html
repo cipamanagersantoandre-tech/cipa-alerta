@@ -509,8 +509,16 @@
             </div>
 
             <button class="btn-topo btn-topo-azul" id="btnEnviarSetor">📤 Enviar para o Setor</button>
-            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver ATA</button>
+            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver Alerta</button>
             <button class="btn-topo" id="btnConfiguracoes" style="background: #4b5563; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">⚙️ Configurações</button>
+            
+            <!-- NOVO CAMPO E BOTÃO DE BUSCA -->
+            <div style="display: flex; gap: 4px; align-items: center; background: white; padding: 3px 3px 3px 10px; border-radius: 4px;">
+                <span style="color: #333; font-size: 12px; font-weight: bold;">ID ATA:</span>
+                <input type="text" id="inputBuscarAta" placeholder="Digite o ID da ATA" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; width: 140px;">
+                <button class="btn-topo" id="btnBuscarAta" style="background: #2563eb; color: white; border: none; padding: 5px 12px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px;">🔍 Buscar</button>
+            </div>
+
             <button class="btn-topo btn-topo-branco" id="btnImprimirTopo">🖨️ Imprimir</button>
         </div>
     </div>
@@ -1529,6 +1537,7 @@ async function carregarRascunhoSelecionado() {
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btnSalvarComNome').addEventListener('click', salvarRascunho);
     document.getElementById('btnCarregarSelecionado').addEventListener('click', carregarRascunhoSelecionado);
+    document.getElementById('btnBuscarAta').addEventListener('click', buscarAtaCipaManager);
     document.getElementById('btnEnviarSetor').addEventListener('click', function() {
         abrirModalEnvio('enviar');
     });
@@ -1560,14 +1569,141 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    const btnAdicionarSetorConfig = document.getElementById('btnAdicionarSetorConfig');
     if (btnAdicionarSetorConfig) {
         btnAdicionarSetorConfig.addEventListener('click', adicionarSetorConfig);
     }
     
-    carregarSetores();
+// ===== BUSCAR DADOS DA ATA DO CIPA MANAGER =====
+async function buscarAtaCipaManager() {
+    const idAta = document.getElementById('inputBuscarAta').value.trim();
+    
+    if (!idAta) {
+        showAlert('❌ Digite o ID da ATA que está no CIPA Manager!');
+        return;
+    }
+    
+    const btn = document.getElementById('btnBuscarAta');
+    const textoOriginal = btn.textContent;
+    btn.textContent = '⏳ Buscando...';
+    btn.disabled = true;
+    
+    try {
+        // Faz a requisição para a aba 'atas' da planilha
+        const url = `${GOOGLE_API_URL}?acao=carregar&aba=atas&id=${encodeURIComponent(idAta)}`;
+        const response = await fetch(url);
+        const resultado = await response.json();
+        
+        if (resultado.status !== 'sucesso' || !resultado.dados) {
+            showAlert('❌ ATA não encontrada no CIPA Manager! Verifique o ID.');
+            btn.textContent = textoOriginal;
+            btn.disabled = false;
+            return;
+        }
+        
+        const dados = JSON.parse(resultado.dados);
+        
+        // Preencher os campos
+        preencherCamposAta(dados);
+        
+        showAlert('✅ ATA carregada com sucesso! Campos preenchidos.');
+        
+    } catch (error) {
+        console.error('Erro ao buscar ata:', error);
+        showAlert('❌ Erro ao buscar ata: ' + error.message);
+    } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+    }
+}
 
-}); // Fim do DOMContentLoaded
+// ===== PREENCHER CAMPOS COM OS DADOS DA ATA DO CIPA MANAGER =====
+function preencherCamposAta(dados) {
+    // 1. UNIDADE OPERACIONAL
+    if (dados.dadosConfiguracao && dados.dadosConfiguracao.unidade) {
+        document.getElementById('unidade').value = dados.dadosConfiguracao.unidade;
+    }
+    
+    // 2. DATA E HORA DE REALIZAÇÃO
+    if (dados.secao1.dataReuniao) {
+        // Converte a data para o formato DD/MM/AAAA
+        const data = new Date(dados.secao1.dataReuniao + 'T00:00:00');
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        const hora = dados.secao1.horaInicio || '';
+        document.getElementById('dataRealizacao').value = dataFormatada + ' - ' + hora;
+    }
+    
+    // 3. Nº DE INTEGRANTES DA CIPA (conta quantos estão presentes)
+    if (dados.secao2 && dados.secao2.presencas) {
+        const presentes = dados.secao2.presencas.filter(p => p.presente === true).length;
+        document.getElementById('numIntegrantes').value = presentes > 0 ? presentes : '';
+    }
+    
+    // 4. SECRETÁRIO RESPONSÁVEL (primeiro membro presente)
+    if (dados.secao2 && dados.secao2.presencas) {
+        const presentes = dados.secao2.presencas.filter(p => p.presente === true);
+        if (presentes.length > 0) {
+            document.getElementById('secretario').value = presentes[0].nome;
+        }
+    }
+    
+    // 5. REPRESENTANTES DO EMPREGADOR (Titulares presentes)
+    if (dados.secao2 && dados.secao2.presencas) {
+        const titulares = dados.secao2.presencas.filter(p => p.tipo === 'Titular' && p.presente === true);
+        if (titulares.length > 0) {
+            document.getElementById('repEmpregadorPresidente').value = titulares[0].nome;
+            if (titulares.length > 1) {
+                document.getElementById('repEmpregadorSuplente').value = titulares[1].nome;
+            }
+        }
+    }
+    
+    // 6. ACIDENTES (Nome, Data, Descrição, Dias Perdidos)
+    const containerAcidentes = document.getElementById('detalheAcidente');
+    if (dados.secao4 && dados.secao4.acidentes && dados.secao4.acidentes.length > 0) {
+        // Marcar "Sim" no campo de acidentes
+        document.getElementById('celulaAcidenteSimNao').innerHTML = '(X) Sim<br>( ) Não';
+        acidenteSim = true;
+        
+        // Montar o texto com os acidentes separados
+        const acidentesTexto = dados.secao4.acidentes.map(a => {
+            let texto = `• ${a.nome || 'N/I'}`;
+            if (a.data) texto += ` (${new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR')})`;
+            if (a.descricao) texto += `: ${a.descricao}`;
+            if (a.dias) texto += ` - ${a.dias} dias perdidos`;
+            return texto;
+        }).join('\n\n');
+        
+        document.getElementById('detalheAcidente').value = acidentesTexto;
+    }
+    
+    // 7. ASSUNTOS ABORDADOS (Temas)
+    if (dados.secao5 && dados.secao5.temas) {
+        const temas = [];
+        if (dados.secao5.temas.tema1) temas.push(`• ${dados.secao5.temas.tema1}`);
+        if (dados.secao5.temas.tema2) temas.push(`• ${dados.secao5.temas.tema2}`);
+        if (dados.secao5.temas.extras && dados.secao5.temas.extras.length > 0) {
+            dados.secao5.temas.extras.forEach(t => temas.push(`• ${t}`));
+        }
+        document.getElementById('assuntosAbordados').value = temas.join('\n\n');
+    }
+    
+    // 8. CONVIDADOS (Pessoas na reunião)
+    const convidados = [];
+    if (dados.secao3) {
+        if (dados.secao3.convidadosFrequentes) {
+            dados.secao3.convidadosFrequentes.forEach(c => convidados.push(c.nome));
+        }
+        if (dados.secao3.convidadosAdicionais) {
+            dados.secao3.convidadosAdicionais.forEach(c => convidados.push(c));
+        }
+    }
+    if (convidados.length > 0) {
+        // Como não temos um campo específico para convidados no formulário da ATA,
+        // vamos adicioná-los no campo de Observações ou no final dos Assuntos Abordados
+        const assuntos = document.getElementById('assuntosAbordados');
+        assuntos.value += '\n\n📌 CONVIDADOS:\n' + convidados.map(c => `• ${c}`).join('\n');
+    }
+}
 
 </script>
 </body>
