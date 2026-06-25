@@ -1603,59 +1603,48 @@ function preencherCamposAta(dados) {
         document.getElementById('dataRealizacao').value = dataFormatada + ' - ' + hora;
     }
     
-    // 3. Nº TOTAL DE EMPREGADOS DO ESTABELECIMENTO
-    // AGORA USA O CAMPO CORRETO QUE VEM DA ATA
-    if (dados.secao1 && dados.secao1.totalEmpregados) {
-        document.getElementById('numEmpregados').value = dados.secao1.totalEmpregados;
-    } else {
-        document.getElementById('numEmpregados').value = '';
-    }
-    
-    // 4. CNAE / GRAU DE RISCO
-    // AGORA USA O CAMPO CORRETO QUE VEM DA ATA
-    if (dados.secao1 && dados.secao1.cnaeRisco) {
-        document.getElementById('cnaeRisco').value = dados.secao1.cnaeRisco;
-    } else {
-        document.getElementById('cnaeRisco').value = '';
-    }
-    
-    // 5. Nº DE INTEGRANTES DA CIPA (TOTAL, NÃO SÓ PRESENTES)
-    if (dados.secao1 && dados.secao1.totalIntegrantes) {
-        document.getElementById('numIntegrantes').value = dados.secao1.totalIntegrantes;
-    } else {
-        document.getElementById('numIntegrantes').value = '';
-    }
-    
-    // 6. PERÍODO DE VIGÊNCIA DO MANDATO
-    if (dados.secao1 && dados.secao1.mandato) {
-        document.getElementById('mandato').value = dados.secao1.mandato;
-    } else {
-        document.getElementById('mandato').value = '';
-    }
-    
-    // 7. SECRETÁRIO RESPONSÁVEL
-    if (dados.secao2 && dados.secao2.presencas) {
-        const presentes = dados.secao2.presencas.filter(p => p.presente === true);
-        if (presentes.length > 0) {
-            document.getElementById('secretario').value = presentes[0].nome;
+    // 3. CAMPOS CUSTOMIZADOS (dentro de customFields)
+    if (dados.customFields) {
+        // Nº TOTAL DE EMPREGADOS
+        if (dados.customFields.moeywuw8pql29etodn) {
+            document.getElementById('numEmpregados').value = dados.customFields.moeywuw8pql29etodn;
         }
+        
+        // CNAE / GRAU DE RISCO
+        if (dados.customFields.moeyxljirqk0g42cgz !== undefined) {
+            document.getElementById('cnaeRisco').value = dados.customFields.moeyxljirqk0g42cgz;
+        }
+        
+        // Nº DE INTEGRANTES DA CIPA
+        if (dados.customFields.moeyy9b20fjtxnhlc58) {
+            document.getElementById('numIntegrantes').value = dados.customFields.moeyy9b20fjtxnhlc58;
+        }
+        
+        // PERÍODO DE VIGÊNCIA DO MANDATO
+        if (dados.customFields.moeyyzq4htrsnasomjn) {
+            document.getElementById('mandato').value = dados.customFields.moeyyzq4htrsnasomjn;
+        }
+        
+        // SECRETÁRIO RESPONSÁVEL
+        if (dados.customFields.moeyz8lw23nk9y8h5kp) {
+            document.getElementById('secretario').value = dados.customFields.moeyz8lw23nk9y8h5kp;
+        }
+        
+        // HOUVE DESLIGAMENTO? (SIM/NÃO)
+        if (dados.customFields.moez1vg0b6zh83pzcu) {
+            const valor = dados.customFields.moez1vg0b6zh83pzcu;
+            document.getElementById('campoSimNao').value = valor === 'SIM' ? 'Sim' : 'Não';
+        }
+        
+        // DETALHES DO DESLIGAMENTO
+        if (dados.customFields.moez2u99hwj3eqy0c8s) {
+            document.getElementById('textoDesligamento').value = dados.customFields.moez2u99hwj3eqy0c8s;
+        }
+        
+        // HOUVE ACIDENTE? (não tem mapeamento direto no customFields, mas usaremos o campo de acidentes da seção 4)
     }
     
-    // 8. HOUVE DESLIGAMENTO?
-    if (dados.secao1 && dados.secao1.houveDesligamento !== undefined) {
-        document.getElementById('campoSimNao').value = dados.secao1.houveDesligamento ? 'Sim' : 'Não';
-    } else {
-        document.getElementById('campoSimNao').value = '';
-    }
-    
-    // 9. DETALHES DO DESLIGAMENTO
-    if (dados.secao1 && dados.secao1.detalheDesligamento) {
-        document.getElementById('textoDesligamento').value = dados.secao1.detalheDesligamento;
-    } else {
-        document.getElementById('textoDesligamento').value = '';
-    }
-    
-    // 10. REPRESENTANTES DO EMPREGADOR
+    // 4. REPRESENTANTES DO EMPREGADOR (vem da seção 2)
     if (dados.secao2 && dados.secao2.presencas) {
         const titulares = dados.secao2.presencas.filter(p => p.tipo === 'Titular' && p.presente === true);
         if (titulares.length > 0) {
@@ -1664,9 +1653,17 @@ function preencherCamposAta(dados) {
                 document.getElementById('repEmpregadorSuplente').value = titulares[1].nome;
             }
         }
+        // VICE E SUPLENTE DOS EMPREGADOS
+        const suplentes = dados.secao2.presencas.filter(p => p.tipo === 'Suplente' && p.presente === true);
+        if (suplentes.length > 0) {
+            document.getElementById('repEmpregadoVice').value = suplentes[0].nome;
+            if (suplentes.length > 1) {
+                document.getElementById('repEmpregadoSuplente').value = suplentes[1].nome;
+            }
+        }
     }
     
-    // 11. ACIDENTES
+    // 5. ACIDENTES (vem da seção 4)
     if (dados.secao4 && dados.secao4.acidentes && dados.secao4.acidentes.length > 0) {
         document.getElementById('celulaAcidenteSimNao').innerHTML = '(X) Sim<br>( ) Não';
         acidenteSim = true;
@@ -1680,7 +1677,7 @@ function preencherCamposAta(dados) {
         document.getElementById('detalheAcidente').value = acidentesTexto;
     }
     
-    // 12. ASSUNTOS ABORDADOS
+    // 6. ASSUNTOS ABORDADOS (vem da seção 5)
     if (dados.secao5 && dados.secao5.temas) {
         const temas = [];
         if (dados.secao5.temas.tema1) temas.push(`• ${dados.secao5.temas.tema1}`);
@@ -1691,12 +1688,11 @@ function preencherCamposAta(dados) {
         document.getElementById('assuntosAbordados').value = temas.join('\n\n');
     }
     
-    // 13. CONVIDADOS (APENAS OS QUE ESTAVAM PRESENTES)
+    // 7. CONVIDADOS (APENAS OS PRESENTES - vem da seção 3)
     const convidados = [];
     if (dados.secao3) {
         if (dados.secao3.convidadosFrequentes) {
             dados.secao3.convidadosFrequentes.forEach(c => {
-                // Só adiciona se o convidado estiver presente
                 if (c.presente === true) {
                     convidados.push(c.nome);
                 }
@@ -1704,7 +1700,6 @@ function preencherCamposAta(dados) {
         }
         if (dados.secao3.convidadosAdicionais) {
             dados.secao3.convidadosAdicionais.forEach(c => {
-                // Só adiciona se o convidado estiver presente
                 if (c.presente === true) {
                     convidados.push(c);
                 }
@@ -1716,13 +1711,11 @@ function preencherCamposAta(dados) {
         assuntos.value += '\n\n📌 CONVIDADOS PRESENTES:\n' + convidados.map(c => `• ${c}`).join('\n');
     }
     
-    // 14. GERENTE
-    if (dados.secao1 && dados.secao1.nomeGerente) {
-        document.getElementById('nomeGerente').value = dados.secao1.nomeGerente;
-    } else {
-        document.getElementById('nomeGerente').value = '';
-    }
+    // 8. GERENTE (não tem no JSON, deixamos em branco)
+    // document.getElementById('nomeGerente').value = '';
 }
+
+
 // ===== CARREGAR LISTA DE ATAS DO CIPA MANAGER =====
 async function carregarListaAtasCipaManager() {
     const select = document.getElementById('selectBuscarAta');
