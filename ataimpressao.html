@@ -1603,25 +1603,36 @@ function preencherCamposAta(dados) {
         document.getElementById('dataRealizacao').value = dataFormatada + ' - ' + hora;
     }
     
-    // 3. Nº TOTAL DE EMPREGADOS (Cálculo baseado nos presentes)
-    // Se o CIPA Manager não envia o total, usamos o número de presentes como referência.
-    if (dados.secao2 && dados.secao2.presencas) {
-        const totalEmpregados = dados.secao2.presencas.length;
-        document.getElementById('numEmpregados').value = totalEmpregados > 0 ? totalEmpregados : '';
+    // 3. Nº TOTAL DE EMPREGADOS DO ESTABELECIMENTO
+    // AGORA USA O CAMPO CORRETO QUE VEM DA ATA
+    if (dados.secao1 && dados.secao1.totalEmpregados) {
+        document.getElementById('numEmpregados').value = dados.secao1.totalEmpregados;
+    } else {
+        document.getElementById('numEmpregados').value = '';
     }
     
-    // 4. CNAE / GRAU DE RISCO (Não vem do CIPA Manager, deixamos em branco para preencher manualmente)
-    // document.getElementById('cnaeRisco').value = ''; // Já está vazio por padrão
-    
-    // 5. Nº DE INTEGRANTES DA CIPA (Calculado)
-    if (dados.secao2 && dados.secao2.presencas) {
-        const presentes = dados.secao2.presencas.filter(p => p.presente === true).length;
-        document.getElementById('numIntegrantes').value = presentes > 0 ? presentes : '';
+    // 4. CNAE / GRAU DE RISCO
+    // AGORA USA O CAMPO CORRETO QUE VEM DA ATA
+    if (dados.secao1 && dados.secao1.cnaeRisco) {
+        document.getElementById('cnaeRisco').value = dados.secao1.cnaeRisco;
+    } else {
+        document.getElementById('cnaeRisco').value = '';
     }
     
-    // 6. PERÍODO DE VIGÊNCIA DO MANDATO (Não vem do CIPA Manager, deixamos em branco)
-    // document.getElementById('mandato').value = ''; // Já está vazio por padrão
-
+    // 5. Nº DE INTEGRANTES DA CIPA (TOTAL, NÃO SÓ PRESENTES)
+    if (dados.secao1 && dados.secao1.totalIntegrantes) {
+        document.getElementById('numIntegrantes').value = dados.secao1.totalIntegrantes;
+    } else {
+        document.getElementById('numIntegrantes').value = '';
+    }
+    
+    // 6. PERÍODO DE VIGÊNCIA DO MANDATO
+    if (dados.secao1 && dados.secao1.mandato) {
+        document.getElementById('mandato').value = dados.secao1.mandato;
+    } else {
+        document.getElementById('mandato').value = '';
+    }
+    
     // 7. SECRETÁRIO RESPONSÁVEL
     if (dados.secao2 && dados.secao2.presencas) {
         const presentes = dados.secao2.presencas.filter(p => p.presente === true);
@@ -1630,7 +1641,21 @@ function preencherCamposAta(dados) {
         }
     }
     
-    // 8. REPRESENTANTES DO EMPREGADOR
+    // 8. HOUVE DESLIGAMENTO?
+    if (dados.secao1 && dados.secao1.houveDesligamento !== undefined) {
+        document.getElementById('campoSimNao').value = dados.secao1.houveDesligamento ? 'Sim' : 'Não';
+    } else {
+        document.getElementById('campoSimNao').value = '';
+    }
+    
+    // 9. DETALHES DO DESLIGAMENTO
+    if (dados.secao1 && dados.secao1.detalheDesligamento) {
+        document.getElementById('textoDesligamento').value = dados.secao1.detalheDesligamento;
+    } else {
+        document.getElementById('textoDesligamento').value = '';
+    }
+    
+    // 10. REPRESENTANTES DO EMPREGADOR
     if (dados.secao2 && dados.secao2.presencas) {
         const titulares = dados.secao2.presencas.filter(p => p.tipo === 'Titular' && p.presente === true);
         if (titulares.length > 0) {
@@ -1641,7 +1666,7 @@ function preencherCamposAta(dados) {
         }
     }
     
-    // 9. ACIDENTES
+    // 11. ACIDENTES
     if (dados.secao4 && dados.secao4.acidentes && dados.secao4.acidentes.length > 0) {
         document.getElementById('celulaAcidenteSimNao').innerHTML = '(X) Sim<br>( ) Não';
         acidenteSim = true;
@@ -1655,7 +1680,7 @@ function preencherCamposAta(dados) {
         document.getElementById('detalheAcidente').value = acidentesTexto;
     }
     
-    // 10. ASSUNTOS ABORDADOS
+    // 12. ASSUNTOS ABORDADOS
     if (dados.secao5 && dados.secao5.temas) {
         const temas = [];
         if (dados.secao5.temas.tema1) temas.push(`• ${dados.secao5.temas.tema1}`);
@@ -1666,22 +1691,38 @@ function preencherCamposAta(dados) {
         document.getElementById('assuntosAbordados').value = temas.join('\n\n');
     }
     
-    // 11. CONVIDADOS
+    // 13. CONVIDADOS (APENAS OS QUE ESTAVAM PRESENTES)
     const convidados = [];
     if (dados.secao3) {
         if (dados.secao3.convidadosFrequentes) {
-            dados.secao3.convidadosFrequentes.forEach(c => convidados.push(c.nome));
+            dados.secao3.convidadosFrequentes.forEach(c => {
+                // Só adiciona se o convidado estiver presente
+                if (c.presente === true) {
+                    convidados.push(c.nome);
+                }
+            });
         }
         if (dados.secao3.convidadosAdicionais) {
-            dados.secao3.convidadosAdicionais.forEach(c => convidados.push(c));
+            dados.secao3.convidadosAdicionais.forEach(c => {
+                // Só adiciona se o convidado estiver presente
+                if (c.presente === true) {
+                    convidados.push(c);
+                }
+            });
         }
     }
     if (convidados.length > 0) {
         const assuntos = document.getElementById('assuntosAbordados');
-        assuntos.value += '\n\n📌 CONVIDADOS:\n' + convidados.map(c => `• ${c}`).join('\n');
+        assuntos.value += '\n\n📌 CONVIDADOS PRESENTES:\n' + convidados.map(c => `• ${c}`).join('\n');
+    }
+    
+    // 14. GERENTE
+    if (dados.secao1 && dados.secao1.nomeGerente) {
+        document.getElementById('nomeGerente').value = dados.secao1.nomeGerente;
+    } else {
+        document.getElementById('nomeGerente').value = '';
     }
 }
-
 // ===== CARREGAR LISTA DE ATAS DO CIPA MANAGER =====
 async function carregarListaAtasCipaManager() {
     const select = document.getElementById('selectBuscarAta');
