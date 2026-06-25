@@ -692,7 +692,9 @@
                 <td class="linha-cinza" colspan="2">ACIDENTES DO TRABALHO OCORRIDOS DESDE A ÚLTIMA REUNIÃO</td>
             </tr>
             <tr>
-                <td class="coluna-simnao" id="celulaAcidenteSimNao" onclick="toggleAcidente()">( ) Sim<br>( ) Não</td>
+<td style="width: 60px; text-align: center; padding: 8px 10px; border-right: 1px solid #999; vertical-align: middle; font-weight: bold; background-color: #f0f0f0;">
+    <input type="text" id="campoAcidenteSimNao" placeholder="Sim/Não" style="width: 100%; border: none; text-align: center; font-weight: bold; background: transparent; outline: none; font-size: 12px; font-family: inherit;">
+</td>
                 <td class="coluna-textarea"><textarea id="detalheAcidente" placeholder="Descreva os acidentes ocorridos..."></textarea></td>
             </tr>
         </table>
@@ -1026,19 +1028,6 @@ async function removerSetor(id) {
     }
 }
 
-// ===== VARIÁVEIS DE SIM/NÃO =====
-let acidenteSim = false;
-
-
-function toggleAcidente() {
-    acidenteSim = !acidenteSim;
-    const celula = document.getElementById('celulaAcidenteSimNao');
-    if (acidenteSim) {
-        celula.innerHTML = '(X) Sim<br>( ) Não';
-    } else {
-        celula.innerHTML = '( ) Sim<br>( ) Não';
-    }
-}
 
 // ===== FUNÇÕES DE COMUNICAÇÃO COM A PLANILHA =====
 async function salvarAtaNaPlanilha(id, dados) {
@@ -1156,7 +1145,7 @@ function coletarDados() {
         repEmpregadorSuplente: document.getElementById('repEmpregadorSuplente').value.trim(),
         repEmpregadoVice: document.getElementById('repEmpregadoVice').value.trim(),
         repEmpregadoSuplente: document.getElementById('repEmpregadoSuplente').value.trim(),
-        houveAcidente: acidenteSim ? 'Sim' : 'Não',
+	houveAcidente: document.getElementById('campoAcidenteSimNao').value.trim(),
         detalheAcidente: document.getElementById('detalheAcidente').value.trim(),
         assuntosAbordados: document.getElementById('assuntosAbordados').value.trim(),
         nomeGerente: document.getElementById('nomeGerente').value.trim(),
@@ -1407,7 +1396,6 @@ function limparTudo() {
     
     acidenteSim = false;
     document.getElementById('celulaDesligamentoSimNao').innerHTML = '( ) Sim<br>( ) Não';
-    document.getElementById('celulaAcidenteSimNao').innerHTML = '( ) Sim<br>( ) Não';
     
     document.getElementById('ataId').value = '';
     document.getElementById('ataIdDisplay').textContent = 'ID: Nova ata';
@@ -1641,7 +1629,11 @@ function preencherCamposAta(dados) {
             document.getElementById('textoDesligamento').value = dados.customFields.moez2u99hwj3eqy0c8s;
         }
         
-        // HOUVE ACIDENTE? (não tem mapeamento direto no customFields, mas usaremos o campo de acidentes da seção 4)
+        // HOUVE ACIDENTE? (agora usa o campo de texto, igual ao desligamento)
+        if (dados.customFields.moez4nlu9v0hile5c25) {
+            const valor = dados.customFields.moez4nlu9v0hile5c25;
+            document.getElementById('campoAcidenteSimNao').value = valor === 'SIM' ? 'Sim' : 'Não';
+        }
     }
     
     // 4. REPRESENTANTES (AGORA VEM DE dadosConfiguracao.membros)
