@@ -884,6 +884,7 @@ function fecharModalConfig() {
 
 // ===== CONFIGURAÇÕES =====
 const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbxd17ig2tDVO1BpRBBqJVCajYli2KQwT1DwHqt5rzIOL5Ga5MWlirjXr6cUK5Qbg6w/exec';
+const GOOGLE_API_URL_CIPA_MANAGER = 'https://script.google.com/macros/s/AKfycbw-_b9zaNoQLblv0iivgKc8zCZyGm_dsgLoAKJjCAfSP-wD1x-YeeAtbvLbx6PBJsokHw/exec';
 const ABA_PLANILHA = 'ata';
 
 // ===== FUNÇÕES DE SETORES E EMAILS (COMPARTILHADAS COM O APP INFORME) =====
@@ -1551,7 +1552,7 @@ async function buscarAtaCipaManager() {
     btn.disabled = true;
     
     try {
-        const url = `${GOOGLE_API_URL}?acao=carregar&aba=atas&id=${encodeURIComponent(idAta)}`;
+        const url = `${GOOGLE_API_URL_CIPA_MANAGER}?acao=carregar&aba=atas&id=${encodeURIComponent(idAta)}`;
         const response = await fetch(url);
         const resultado = await response.json();
         
@@ -1662,7 +1663,7 @@ async function carregarListaAtasCipaManager() {
     if (!select) return;
     
     try {
-        const url = `${GOOGLE_API_URL}`;
+        const url = `${GOOGLE_API_URL_CIPA_MANAGER}?acao=carregarTudo&aba=atas`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
