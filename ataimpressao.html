@@ -1118,13 +1118,6 @@ function preencherCampos(dados) {
     if (dados.repEmpregadoVice) document.getElementById('repEmpregadoVice').value = dados.repEmpregadoVice;
     if (dados.repEmpregadoSuplente) document.getElementById('repEmpregadoSuplente').value = dados.repEmpregadoSuplente;
     
-    if (dados.houveAcidente === 'Sim') {
-        acidenteSim = true;
-        document.getElementById('celulaAcidenteSimNao').innerHTML = '(X) Sim<br>( ) Não';
-    } else if (dados.houveAcidente === 'Não') {
-        acidenteSim = false;
-        document.getElementById('celulaAcidenteSimNao').innerHTML = '( ) Sim<br>( ) Não';
-    }
     if (dados.detalheAcidente) document.getElementById('detalheAcidente').value = dados.detalheAcidente;
     
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
