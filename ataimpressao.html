@@ -628,8 +628,11 @@
                 <td class="linha-cinza" colspan="2">HOUVE DESLIGAMENTO OU TRANSFERÊNCIA DE MEMBROS DESDE A ÚLTIMA REUNIÃO REALIZADA?</td>
             </tr>
             <tr>
-                <td colspan="2" style="padding: 0;">
-                    <input type="text" id="textoDesligamento" placeholder="Digite Sim ou Não" style="width: 100%; padding: 8px 10px; font-size: 12px; font-family: inherit; border: 1px solid #999; outline: none;">
+                <td style="width: 60px; text-align: center; padding: 8px 10px; border-right: 1px solid #999; vertical-align: middle; font-weight: bold; background-color: #f0f0f0;">
+                    <input type="text" id="campoSimNao" placeholder="Sim/Não" style="width: 100%; border: none; text-align: center; font-weight: bold; background: transparent; outline: none; font-size: 12px; font-family: inherit;">
+                </td>
+                <td style="padding: 0;">
+                    <input type="text" id="textoDesligamento" placeholder="Detalhar desligamentos/transferências..." style="width: 100%; padding: 8px 10px; font-size: 12px; font-family: inherit; border: none; outline: none;">
                 </td>
             </tr>
         </table>
@@ -1094,17 +1097,15 @@ function preencherCampos(dados) {
     if (dados.mandato) document.getElementById('mandato').value = dados.mandato;
     if (dados.secretario) document.getElementById('secretario').value = dados.secretario;
     
-    // 1. DESLIGAMENTO (Sim/Não + detalhes, tudo em um campo)
-    let desligamentoTexto = '';
+    // 1. DESLIGAMENTO (Sim/Não separado dos detalhes)
     if (dados.houveDesligamento === 'Sim') {
-        desligamentoTexto = 'Sim';
+        document.getElementById('campoSimNao').value = 'Sim';
     } else if (dados.houveDesligamento === 'Não') {
-        desligamentoTexto = 'Não';
+        document.getElementById('campoSimNao').value = 'Não';
     }
     if (dados.textoDesligamento) {
-        desligamentoTexto += ' - ' + dados.textoDesligamento;
+        document.getElementById('textoDesligamento').value = dados.textoDesligamento;
     }
-    document.getElementById('textoDesligamento').value = desligamentoTexto;
     
     if (dados.repEmpregadorPresidente) document.getElementById('repEmpregadorPresidente').value = dados.repEmpregadorPresidente;
     if (dados.repEmpregadorSuplente) document.getElementById('repEmpregadorSuplente').value = dados.repEmpregadorSuplente;
