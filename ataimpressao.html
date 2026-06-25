@@ -1094,8 +1094,6 @@ function preencherCampos(dados) {
     if (dados.mandato) document.getElementById('mandato').value = dados.mandato;
     if (dados.secretario) document.getElementById('secretario').value = dados.secretario;
     
-    // 1. DESLIGAMENTO (Sim/Não vem do CIPA Manager)
-    let desligamentoTexto = '';
     // 1. DESLIGAMENTO (Sim/Não + detalhes, tudo em um campo)
     let desligamentoTexto = '';
     if (dados.houveDesligamento === 'Sim') {
@@ -1105,8 +1103,6 @@ function preencherCampos(dados) {
     }
     if (dados.textoDesligamento) {
         desligamentoTexto += ' - ' + dados.textoDesligamento;
-    }
-    document.getElementById('textoDesligamento').value = desligamentoTexto;
     }
     document.getElementById('textoDesligamento').value = desligamentoTexto;
     
@@ -1391,7 +1387,6 @@ function limparTudo() {
         if (input.type !== 'hidden') input.value = '';
     });
     
-    desligamentoSim = false;
     acidenteSim = false;
     document.getElementById('celulaDesligamentoSimNao').innerHTML = '( ) Sim<br>( ) Não';
     document.getElementById('celulaAcidenteSimNao').innerHTML = '( ) Sim<br>( ) Não';
