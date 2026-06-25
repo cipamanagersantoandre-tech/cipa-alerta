@@ -632,7 +632,7 @@
         </table>
 
 <!-- BLOCO 2: DESLIGAMENTO -->
-<table class="tabela-desligamento" style="border-bottom: 1px solid #999;">
+<table class="tabela-desligamento">
     <tr>
         <td class="linha-cinza" colspan="2">HOUVE DESLIGAMENTO OU TRANSFERÊNCIA DE MEMBROS DESDE A ÚLTIMA REUNIÃO REALIZADA?</td>
     </tr>
@@ -643,6 +643,10 @@
         <td style="padding: 0;">
             <input type="text" id="textoDesligamento" placeholder="Detalhar desligamentos/transferências..." style="width: 100%; padding: 8px 10px; font-size: 12px; font-family: inherit; border: none; outline: none;">
         </td>
+    </tr>
+    <!-- LINHA EXTRA PARA FORÇAR A BORDA INFERIOR -->
+    <tr style="border-top: 1px solid #999; height: 0; visibility: hidden;">
+        <td colspan="2" style="border: none; padding: 0; height: 0;"></td>
     </tr>
 </table>
 
