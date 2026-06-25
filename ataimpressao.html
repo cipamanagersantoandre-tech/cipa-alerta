@@ -1644,17 +1644,23 @@ function preencherCamposAta(dados) {
         // HOUVE ACIDENTE? (não tem mapeamento direto no customFields, mas usaremos o campo de acidentes da seção 4)
     }
     
-    // 4. REPRESENTANTES DO EMPREGADOR (vem da seção 2)
-    if (dados.secao2 && dados.secao2.presencas) {
-        const titulares = dados.secao2.presencas.filter(p => p.tipo === 'Titular' && p.presente === true);
+    // 4. REPRESENTANTES (AGORA VEM DE dadosConfiguracao.membros)
+    if (dados.dadosConfiguracao && dados.dadosConfiguracao.membros) {
+        const membros = dados.dadosConfiguracao.membros;
+        
+        // Separar Titulares e Suplentes
+        const titulares = membros.filter(m => m.tipo === 'Titular');
+        const suplentes = membros.filter(m => m.tipo === 'Suplente');
+        
+        // Preencher Representantes do Empregador (Titulares)
         if (titulares.length > 0) {
             document.getElementById('repEmpregadorPresidente').value = titulares[0].nome;
             if (titulares.length > 1) {
                 document.getElementById('repEmpregadorSuplente').value = titulares[1].nome;
             }
         }
-        // VICE E SUPLENTE DOS EMPREGADOS
-        const suplentes = dados.secao2.presencas.filter(p => p.tipo === 'Suplente' && p.presente === true);
+        
+        // Preencher Representantes dos Empregados (Suplentes)
         if (suplentes.length > 0) {
             document.getElementById('repEmpregadoVice').value = suplentes[0].nome;
             if (suplentes.length > 1) {
