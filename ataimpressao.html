@@ -1433,7 +1433,6 @@ async function devolverAta() {
     }
 }
 
-// ===== LIMPAR TUDO =====
 function limparTudo() {
     if (!confirm('Tem certeza que deseja limpar todos os campos?')) return;
     
@@ -1442,7 +1441,6 @@ function limparTudo() {
         if (input.type !== 'hidden') input.value = '';
     });
     
-    acidenteSim = false;
     document.getElementById('celulaDesligamentoSimNao').innerHTML = '( ) Sim<br>( ) Não';
     
     document.getElementById('ataId').value = '';
