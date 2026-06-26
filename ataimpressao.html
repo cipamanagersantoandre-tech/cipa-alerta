@@ -1904,27 +1904,38 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// SISTEMA DE PAGINAÇÃO (atualizado para usar CSS counter)
+// SISTEMA DE PAGINAÇÃO - CONTA RODAPÉS PARA NUMERAR AS PÁGINAS
 (function() {
     
-    function atualizarPaginacao() {
-        const spanPagina = document.querySelector('.page-number');
-        if (spanPagina) {
-            // Limpa qualquer texto que o JavaScript colocou
-            // O CSS counter(page) vai preencher automaticamente na impressão
-            spanPagina.textContent = '';
-        }
+    function numerarPaginas() {
+        // Pega todos os rodapés de impressão
+        const rodapes = document.querySelectorAll('.rodape-impressao');
+        const totalPaginas = rodapes.length;
+        
+        if (totalPaginas === 0) return;
+        
+        // Numera cada rodapé: Página 1 de X, Página 2 de X...
+        rodapes.forEach((rodape, index) => {
+            const numeroPagina = index + 1;
+            const spanPagina = rodape.querySelector('.page-number');
+            if (spanPagina) {
+                spanPagina.textContent = numeroPagina + ' de ' + totalPaginas;
+            }
+        });
     }
 
     // Executa quando a página carrega
     document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(atualizarPaginacao, 300);
+        setTimeout(numerarPaginas, 500);
     });
     
     // Executa antes de imprimir
     window.onbeforeprint = function() {
-        atualizarPaginacao();
+        numerarPaginas();
     };
+    
+    // Se houver mudança na página (ex: após buscar ata), renumera
+    setTimeout(numerarPaginas, 2000);
 
 })();
 </script>
