@@ -470,14 +470,6 @@
     .tabela-desligamento tr:last-child td {
         border-bottom: 1px solid #999 !important;
     }
-
-    /* Atualiza o número da página automaticamente */
-.page-number::before {
-    content: counter(page);
-}
-    .total-pages::before {
-        content: counter(pages);
-    }
 }
 
 
@@ -513,7 +505,7 @@
 @page { 
     size: A4; 
     margin: 3mm;
-    margin-top: 0.5cm; /* Margem menor pois o cabeçalho será gerado automaticamente */
+    margin-top: 0.5cm;
 }
 
 /* Removemos o cabecalho-impressao antigo, pois agora o cabeçalho está dentro da tabela */
