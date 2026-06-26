@@ -471,7 +471,7 @@
         border-bottom: 1px solid #999 !important;
     }
 
-    /* SISTEMA DE PAGINAÇÃO AUTOMÁTICA */
+    /* SISTEMA DE PAGINAÇÃO - FUNCIONA EM TODOS OS NAVEGADORES */
     .rodape-impressao {
         position: fixed;
         bottom: 0;
@@ -487,14 +487,9 @@
         z-index: 9999;
     }
     
-    /* Aqui está o segredo: usa o contador automático do navegador */
-    .page-number::after {
+    /* Mostra número da página atual e total */
+    .page-number::before {
         content: counter(page) " de " counter(pages);
-    }
-    
-    /* Inicia os contadores de página */
-    @page {
-        counter-increment: page;
     }
 
 }
@@ -533,6 +528,11 @@
     size: A4; 
     margin: 3mm;
     margin-top: 0.5cm;
+    
+    /* INICIA O CONTADOR DE PÁGINAS */
+    @bottom-center {
+        content: none;
+    }
 }
 
 /* Removemos o cabecalho-impressao antigo, pois agora o cabeçalho está dentro da tabela */
