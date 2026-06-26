@@ -1177,6 +1177,17 @@ function preencherCampos(dados) {
     
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
     if (dados.nomeGerente) document.getElementById('nomeGerente').value = dados.nomeGerente;
+    // ===== ATUALIZAR RODAPÉ (PARA RASCUNHOS) =====
+    // Data e Hora
+    if (dados.dataRealizacao) {
+        document.getElementById('rodapeData').textContent = 'Data: ' + dados.dataRealizacao;
+    }
+    
+    // Secretário Responsável
+    if (dados.secretario) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.secretario;
+    }
+
 }
 
 function coletarDados() {
@@ -1868,19 +1879,33 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// CORREÇÃO DA PAGINAÇÃO (EXECUTA NA IMPRESSÃO)
+// CORREÇÃO DA PAGINAÇÃO E RODAPÉ (EXECUTA NA IMPRESSÃO E AO CARREGAR)
 (function() {
-    // Só executa quando a impressão for solicitada
+    // Função que atualiza o total de páginas
+    function atualizarTotalPaginas() {
+        const elementoPagina = document.querySelector('.pagina-impressao');
+        if (elementoPagina) {
+            // Calcula a altura total do documento dividido pela altura de uma página A4 (~1100px)
+            const totalPaginas = Math.ceil(elementoPagina.scrollHeight / 1100);
+            
+            // Define o total em todos os rodapés
+            const totais = document.querySelectorAll('.total-pages');
+            totais.forEach(el => {
+                el.textContent = totalPaginas;
+            });
+        }
+    }
+
+    // Executa quando a impressão for solicitada
     window.onbeforeprint = function() {
-        // Conta quantas páginas o navegador vai gerar (não é perfeito, mas funciona na maioria dos casos)
-        const totalPaginas = Math.ceil(document.querySelector('.pagina-impressao').scrollHeight / 1100); // ~1100px por página A4
-        
-        // Define o total em todos os rodapés
-        const totais = document.querySelectorAll('.total-pages');
-        totais.forEach(el => {
-            el.textContent = totalPaginas;
-        });
+        atualizarTotalPaginas();
     };
+
+    // Executa sempre que a página for carregada (para rascunhos)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aguarda um pequeno momento para os dados serem preenchidos
+        setTimeout(atualizarTotalPaginas, 500);
+    });
 })();
 </script>
 </body>
