@@ -568,6 +568,12 @@
                 <button class="btn-topo" id="btnBuscarAta" style="background: #2563eb; color: white; border: none; padding: 5px 12px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px;">🔍 Buscar</button>
             </div>
 
+            <!-- CAMPO PARA INFORMAR O TOTAL DE PÁGINAS MANUALMENTE -->
+            <div style="display: flex; gap: 4px; align-items: center; background: white; padding: 3px 3px 3px 10px; border-radius: 4px;">
+                <span style="color: #333; font-size: 12px; font-weight: bold;">Páginas:</span>
+                <input type="number" id="inputTotalPaginas" value="1" min="1" style="padding: 4px 8px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; width: 50px;">
+                <button class="btn-topo btn-topo-branco" id="btnDefinirTotalPaginas">📄 Definir Total</button>
+            </div>
             <button class="btn-topo btn-topo-branco" id="btnImprimirTopo">🖨️ Imprimir</button>
         </div>
     </div>
@@ -1885,37 +1891,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// CORREÇÃO DA PAGINAÇÃO (EXECUTA NA IMPRESSÃO E AO CARREGAR)
-(function() {
-    // Função que atualiza o total de páginas
-    function atualizarTotalPaginas() {
-        // Espera um pouquinho para o conteúdo renderizar completamente
-        setTimeout(function() {
-            const elementoPagina = document.querySelector('.pagina-impressao');
-            if (elementoPagina) {
-                // Calcula a altura total do documento dividido pela altura de uma página A4 (~1100px)
-                // Adicionamos um pequeno offset para evitar arredondamentos errados
-                const totalPaginas = Math.ceil((elementoPagina.scrollHeight + 20) / 1100);
-                
-                // Define o total em todos os rodapés
-                const totais = document.querySelectorAll('.total-pages');
-                totais.forEach(el => {
-                    el.textContent = totalPaginas;
-                });
-            }
-        }, 100); // Aguarda 100ms para garantir que o layout esteja pronto
-    }
 
-    // Executa quando a impressão for solicitada
-    window.onbeforeprint = function() {
-        atualizarTotalPaginas();
-    };
-
-    // Executa sempre que a página for carregada (para rascunhos)
-    document.addEventListener('DOMContentLoaded', function() {
-        atualizarTotalPaginas();
-    });
-})();
 </script>
 </body>
 </html>
