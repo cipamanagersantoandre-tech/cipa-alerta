@@ -1666,10 +1666,8 @@ function preencherCamposAta(dados) {
         }
     }
     
-    // 5. ACIDENTES (vem da seção 4)
+    // 5. ACIDENTES (vem da seção 4) - APENAS O TEXTO
     if (dados.secao4 && dados.secao4.acidentes && dados.secao4.acidentes.length > 0) {
-        document.getElementById('celulaAcidenteSimNao').innerHTML = '(X) Sim<br>( ) Não';
-        acidenteSim = true;
         const acidentesTexto = dados.secao4.acidentes.map(a => {
             let texto = `• ${a.nome || 'N/I'}`;
             if (a.data) texto += ` (${new Date(a.data + 'T00:00:00').toLocaleDateString('pt-BR')})`;
