@@ -803,13 +803,11 @@
 </div>
 
 <!-- RODAPÉ DA PÁGINA (APARECE SOMENTE NA IMPRESSÃO) -->
-<div class="rodape-impressao">
-    <!-- LADO ESQUERDO: DATA E SECRETÁRIO -->
+<div class="rodape-impressao" id="rodapeOriginal">
     <div class="rodape-esquerda">
         <span id="rodapeData">Data: </span><br>
         <span id="rodapeSecretario">Secretário: </span>
     </div>
-    <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
     <div class="rodape-direita">
         Página <span class="page-number">1 de 1</span>
     </div>
@@ -1879,53 +1877,229 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// SISTEMA DE PAGINAÇÃO - MÉTODO GARANTIDO
+// ==========================================
+// SISTEMA DE PAGINAÇÃO REAL - DIVIDE O CONTEÚDO EM PÁGINAS A4
+// ==========================================
 (function() {
     
-    function criarPaginacao() {
+    // Guarda o conteúdo original para restaurar depois
+    let conteudoOriginal = null;
+    let containerOriginal = null;
+    
+    function dividirEmPaginas() {
         const container = document.querySelector('.pagina-impressao');
         if (!container) return;
         
-        // Guarda o conteúdo original
-        const conteudoOriginal = container.innerHTML;
-        
-        // Altura útil de uma página A4 em pixels
-        const ALTURA_PAGINA = 1050; // Um pouco menor para margem de segurança
-        
-        // Cria um elemento temporário para medir
-        const temp = document.createElement('div');
-        temp.style.cssText = 'position:absolute;visibility:hidden;width:210mm;';
-        temp.innerHTML = conteudoOriginal;
-        document.body.appendChild(temp);
-        
-        // Calcula número de páginas
-        const alturaTotal = temp.scrollHeight;
-        const totalPaginas = Math.max(1, Math.ceil(alturaTotal / ALTURA_PAGINA));
-        document.body.removeChild(temp);
-        
-        // Atualiza o rodapé com a informação correta
-        const spanPagina = document.querySelector('.page-number');
-        if (spanPagina) {
-            spanPagina.innerHTML = '<span class="pagina-atual">1</span> de <span class="pagina-total">' + totalPaginas + '</span>';
+        // Salva referência e conteúdo original (só na primeira vez)
+        if (!conteudoOriginal) {
+            containerOriginal = container;
+            conteudoOriginal = container.innerHTML;
         }
         
-        // Guarda o total para uso na impressão
-        window.__totalPaginas = totalPaginas;
+        // Restaura o conteúdo original antes de recalcular
+        container.innerHTML = conteudoOriginal;
+        
+        // Pega todos os elementos filhos diretos do container
+        const filhos = Array.from(container.children).filter(el => {
+            // Ignora o rodapé original
+            return el.id !== 'rodapeOriginal';
+        });
+        
+        // Remove tudo do container
+        container.innerHTML = '';
+        
+        // Altura máxima de uma página A4 (em pixels)
+        // A4 = 297mm, margem de 5mm = 287mm úteis
+        // 1mm ≈ 3.78px, então 287 × 3.78 ≈ 1085px
+        // Usamos 1000px para ter margem de segurança
+        const ALTURA_MAXIMA = 1000;
+        
+        // Cria um elemento temporário para medir alturas
+        const medidor = document.createElement('div');
+        medidor.style.cssText = `
+            width: 210mm;
+            position: absolute;
+            visibility: hidden;
+            top: -9999px;
+            left: -9999px;
+        `;
+        document.body.appendChild(medidor);
+        
+        // Array para guardar os grupos de elementos de cada página
+        const paginas = [];
+        let paginaAtual = [];
+        let alturaAtual = 0;
+        
+        // Distribui os elementos entre as páginas
+        filhos.forEach(elemento => {
+            // Clona o elemento para medir
+            const clone = elemento.cloneNode(true);
+            medidor.appendChild(clone);
+            const alturaElemento = medidor.scrollHeight;
+            medidor.innerHTML = '';
+            
+            // Se este elemento sozinho é maior que uma página, coloca ele sozinho
+            if (alturaElemento > ALTURA_MAXIMA) {
+                if (paginaAtual.length > 0) {
+                    paginas.push(paginaAtual);
+                    paginaAtual = [];
+                    alturaAtual = 0;
+                }
+                paginas.push([elemento]);
+                return;
+            }
+            
+            // Se não cabe na página atual, cria uma nova
+            if (alturaAtual + alturaElemento > ALTURA_MAXIMA && paginaAtual.length > 0) {
+                paginas.push(paginaAtual);
+                paginaAtual = [];
+                alturaAtual = 0;
+            }
+            
+            paginaAtual.push(elemento);
+            alturaAtual += alturaElemento;
+        });
+        
+        // Não esquecer da última página
+        if (paginaAtual.length > 0) {
+            paginas.push(paginaAtual);
+        }
+        
+        // Remove o medidor
+        document.body.removeChild(medidor);
+        
+        // Se só tem 1 página, deixa o conteúdo original com o rodapé original
+        if (paginas.length <= 1) {
+            container.innerHTML = conteudoOriginal;
+            const rodape = document.getElementById('rodapeOriginal');
+            const pageNumber = document.querySelector('.page-number');
+            if (pageNumber) {
+                pageNumber.textContent = '1 de 1';
+            }
+            if (rodape) {
+                rodape.style.display = 'flex';
+            }
+            return paginas.length;
+        }
+        
+        // Esconde o rodapé original (vamos criar um para cada página)
+        const rodapeOriginal = document.getElementById('rodapeOriginal');
+        if (rodapeOriginal) {
+            rodapeOriginal.style.display = 'none';
+        }
+        
+        // Cria cada página com seu próprio rodapé
+        const totalPaginas = paginas.length;
+        paginas.forEach((elementos, index) => {
+            const numPagina = index + 1;
+            
+            // Cria a div da página
+            const divPagina = document.createElement('div');
+            divPagina.className = 'pagina-fisica';
+            divPagina.style.cssText = `
+                width: 210mm;
+                min-height: 297mm;
+                padding: 5mm;
+                background: white;
+                box-sizing: border-box;
+                page-break-after: always;
+                position: relative;
+                padding-bottom: 30px;
+            `;
+            
+            // Se for a última página, não quebra depois
+            if (index === totalPaginas - 1) {
+                divPagina.style.pageBreakAfter = 'avoid';
+            }
+            
+            // Adiciona os elementos nesta página
+            elementos.forEach(el => {
+                divPagina.appendChild(el.cloneNode(true));
+            });
+            
+            // Cria o rodapé desta página
+            const rodape = document.createElement('div');
+            rodape.style.cssText = `
+                position: absolute;
+                bottom: 0;
+                left: 5mm;
+                right: 5mm;
+                padding: 5px 10px;
+                border-top: 1px solid #ccc;
+                display: flex;
+                justify-content: space-between;
+                font-size: 10px;
+                color: #666;
+                background: white;
+            `;
+            
+            // Pega data e secretário dos campos
+            const data = document.getElementById('dataRealizacao')?.value || '';
+            const secretario = document.getElementById('secretario')?.value || '';
+            
+            rodape.innerHTML = `
+                <div style="text-align: left;">
+                    <span>Data: ${data}</span><br>
+                    <span>Secretário: ${secretario}</span>
+                </div>
+                <div style="text-align: right;">
+                    Página ${numPagina} de ${totalPaginas}
+                </div>
+            `;
+            
+            divPagina.appendChild(rodape);
+            container.appendChild(divPagina);
+        });
+        
+        return totalPaginas;
     }
-
-    // Executa quando carrega
+    
+    // Restaura o layout original (para edição na tela)
+    function restaurarOriginal() {
+        if (containerOriginal && conteudoOriginal) {
+            containerOriginal.innerHTML = conteudoOriginal;
+            const rodape = document.getElementById('rodapeOriginal');
+            if (rodape) {
+                rodape.style.display = 'flex';
+            }
+        }
+    }
+    
+    // Quando a página carrega
     document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(criarPaginacao, 500);
+        // Na tela, mostra normal (sem dividir)
+        restaurarOriginal();
+        
+        // Atualiza o número no rodapé original
+        setTimeout(function() {
+            const container = document.querySelector('.pagina-impressao');
+            if (container) {
+                const alturaTotal = container.scrollHeight;
+                const totalEstimado = Math.max(1, Math.ceil(alturaTotal / 1000));
+                const pageNumber = document.querySelector('.page-number');
+                if (pageNumber) {
+                    pageNumber.textContent = '1 de ' + totalEstimado;
+                }
+            }
+        }, 500);
     });
     
-    // Executa antes de imprimir
+    // ANTES de imprimir: divide em páginas
     window.onbeforeprint = function() {
-        criarPaginacao();
+        dividirEmPaginas();
     };
     
-    // Também executa quando a janela redimensiona
-    window.addEventListener('resize', function() {
-        setTimeout(criarPaginacao, 300);
+    // DEPOIS de imprimir: restaura o original
+    window.onafterprint = function() {
+        restaurarOriginal();
+    };
+    
+    // Se cancelar a impressão, também restaura
+    window.matchMedia('print').addEventListener('change', function(e) {
+        if (!e.matches) {
+            // Saiu do modo de impressão
+            setTimeout(restaurarOriginal, 300);
+        }
     });
 
 })();
