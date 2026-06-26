@@ -472,10 +472,42 @@
     }
 }
 
+
+    /* SISTEMA DE PAGINAÇÃO - MÉTODO HÍBRIDO */
+    .rodape-impressao {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 5px 10px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #666;
+        z-index: 9999;
+    }
+    
+    /* Força quebra de página entre as divs de página */
+    .pagina-fisica {
+        page-break-after: always;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 5mm;
+        background: white;
+        box-sizing: border-box;
+    }
+    
+    .pagina-fisica:last-child {
+        page-break-after: avoid;
+    }
+}
+
 @page { 
     size: A4; 
     margin: 3mm;
-    margin-top: 0.5cm; /* Margem menor pois o cabeçalho será gerado automaticamente */
+    margin-top: 0.5cm;
 }
 
 /* Removemos o cabecalho-impressao antigo, pois agora o cabeçalho está dentro da tabela */
@@ -518,7 +550,7 @@
             </div>
 
             <button class="btn-topo btn-topo-azul" id="btnEnviarSetor">📤 Enviar para o Setor</button>
-            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver Alerta</button>
+            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver ATA</button>
             <button class="btn-topo" id="btnConfiguracoes" style="background: #4b5563; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">⚙️ Configurações</button>
             
             <!-- NOVO CAMPO E BOTÃO DE BUSCA (COM LISTA SUSPENSA) -->
@@ -574,22 +606,24 @@
 
         <!-- INÍCIO DA TABELA MÃE (para repetir o cabeçalho em todas as páginas) -->
         <table style="width: 100%; border-collapse: collapse; border: none;">
-            <thead style="display: table-header-group;">
-                <tr>
-                    <td style="width: 25%; text-align: left; vertical-align: middle; border: none; padding-bottom: 5px;">
-                        <img src="https://lh3.googleusercontent.com/d/1IxAvEHlQ6RqYpt5FLPSwXf08g4yqqWFp" 
-                             id="logoImagem"
-                             style="max-width: 90px; max-height: 80px; filter: grayscale(100%); opacity: 0.8;">
-                    </td>
-                    <td style="width: 75%; text-align: right; vertical-align: middle; border: none; padding-bottom: 5px;">
-                        <div style="font-size: 14px; font-weight: bold; color: #808080;">SERVIÇO SOCIAL DO COMÉRCIO</div>
-                        <div style="font-size: 11px; color: #808080;">Administração Regional do Estado de São Paulo</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="border-bottom: 1px solid #808080; padding-bottom: 10px;"></td>
-                </tr>
-            </thead>
+<thead style="display: table-header-group;">
+    <tr>
+        <td style="width: 25%; text-align: left; vertical-align: middle; border: none; padding-bottom: 5px;">
+            <img src="https://lh3.googleusercontent.com/d/1IxAvEHlQ6RqYpt5FLPSwXf08g4yqqWFp" 
+                 id="logoImagem"
+                 style="max-width: 90px; max-height: 80px; filter: grayscale(100%); opacity: 0.8;">
+        </td>
+        <td style="width: 75%; text-align: right; vertical-align: middle; border: none; padding-bottom: 5px;">
+            <div style="font-size: 14px; font-weight: bold; color: #808080;">SERVIÇO SOCIAL DO COMÉRCIO</div>
+            <div style="font-size: 11px; color: #808080;">Administração Regional do Estado de São Paulo</div>
+            <!-- ADICIONE A LINHA ABAIXO: -->
+            
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="border-bottom: 1px solid #808080; padding-bottom: 10px;"></td>
+    </tr>
+</thead>
             <tbody>
                 <tr>
                     <td colspan="2" style="border: none; padding: 0;">
@@ -738,7 +772,7 @@
 </div>
 
 
-</div>
+    </div>
 </div>
 
 <!-- MODAL DE CONFIGURAÇÕES DE SETORES E EMAILS -->
@@ -767,6 +801,21 @@
 
     </div>
 </div>
+
+<!-- RODAPÉ DA PÁGINA (APARECE SOMENTE NA IMPRESSÃO) -->
+<div class="rodape-impressao">
+    <!-- LADO ESQUERDO: DATA E SECRETÁRIO -->
+    <div class="rodape-esquerda">
+        <span id="rodapeData">Data: </span><br>
+        <span id="rodapeSecretario">Secretário: </span>
+    </div>
+    <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
+    <div class="rodape-direita">
+        Página <span class="page-number">1 de 1</span>
+    </div>
+</div>
+
+</div> <!-- Fim do container principal -->
 
 <script>
 
@@ -1098,30 +1147,47 @@ function preencherCampos(dados) {
     if (dados.numIntegrantes) document.getElementById('numIntegrantes').value = dados.numIntegrantes;
     if (dados.mandato) document.getElementById('mandato').value = dados.mandato;
     if (dados.secretario) document.getElementById('secretario').value = dados.secretario;
-    if (dados.numEmpregados) document.getElementById('numEmpregados').value = dados.numEmpregados;
-    if (dados.cnaeRisco) document.getElementById('cnaeRisco').value = dados.cnaeRisco;
-    if (dados.numIntegrantes) document.getElementById('numIntegrantes').value = dados.numIntegrantes;
-    if (dados.mandato) document.getElementById('mandato').value = dados.mandato;
     
-    // 1. DESLIGAMENTO (Sim/Não separado dos detalhes)
-    if (dados.houveDesligamento === 'Sim') {
+    // ===== BLOCO 2: DESLIGAMENTO =====
+    if (dados.houveDesligamento === 'Sim' || dados.houveDesligamento === 'SIM') {
         document.getElementById('campoSimNao').value = 'Sim';
-    } else if (dados.houveDesligamento === 'Não') {
+    } else if (dados.houveDesligamento === 'Não' || dados.houveDesligamento === 'NÃO') {
         document.getElementById('campoSimNao').value = 'Não';
+    } else {
+        document.getElementById('campoSimNao').value = '';
     }
     if (dados.textoDesligamento) {
         document.getElementById('textoDesligamento').value = dados.textoDesligamento;
     }
     
+    // ===== BLOCO 3: REPRESENTANTES =====
     if (dados.repEmpregadorPresidente) document.getElementById('repEmpregadorPresidente').value = dados.repEmpregadorPresidente;
     if (dados.repEmpregadorSuplente) document.getElementById('repEmpregadorSuplente').value = dados.repEmpregadorSuplente;
     if (dados.repEmpregadoVice) document.getElementById('repEmpregadoVice').value = dados.repEmpregadoVice;
     if (dados.repEmpregadoSuplente) document.getElementById('repEmpregadoSuplente').value = dados.repEmpregadoSuplente;
     
-    if (dados.detalheAcidente) document.getElementById('detalheAcidente').value = dados.detalheAcidente;
+    // ===== BLOCO 4: ACIDENTES =====
+    if (dados.houveAcidente === 'Sim' || dados.houveAcidente === 'SIM') {
+        document.getElementById('campoAcidenteSimNao').value = 'Sim';
+    } else if (dados.houveAcidente === 'Não' || dados.houveAcidente === 'NÃO') {
+        document.getElementById('campoAcidenteSimNao').value = 'Não';
+    } else {
+        document.getElementById('campoAcidenteSimNao').value = '';
+    }
+    if (dados.detalheAcidente) {
+        document.getElementById('detalheAcidente').value = dados.detalheAcidente;
+    }
     
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
     if (dados.nomeGerente) document.getElementById('nomeGerente').value = dados.nomeGerente;
+    
+    // ===== ATUALIZAR RODAPÉ (PARA RASCUNHOS) =====
+    if (dados.dataRealizacao) {
+        document.getElementById('rodapeData').textContent = 'Data: ' + dados.dataRealizacao;
+    }
+    if (dados.secretario) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.secretario;
+    }
 }
 
 function coletarDados() {
@@ -1378,7 +1444,6 @@ async function devolverAta() {
     }
 }
 
-// ===== LIMPAR TUDO =====
 function limparTudo() {
     if (!confirm('Tem certeza que deseja limpar todos os campos?')) return;
     
@@ -1387,7 +1452,6 @@ function limparTudo() {
         if (input.type !== 'hidden') input.value = '';
     });
     
-    acidenteSim = false;
     document.getElementById('celulaDesligamentoSimNao').innerHTML = '( ) Sim<br>( ) Não';
     
     document.getElementById('ataId').value = '';
@@ -1714,6 +1778,20 @@ function preencherCamposAta(dados) {
     
     // 8. GERENTE (não tem no JSON, deixamos em branco)
     // document.getElementById('nomeGerente').value = '';
+
+    // ===== ATUALIZAR RODAPÉ =====
+    // Data e Hora
+    if (dados.secao1 && dados.secao1.dataReuniao) {
+        const data = new Date(dados.secao1.dataReuniao + 'T00:00:00');
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        const hora = dados.secao1.horaInicio || '';
+        document.getElementById('rodapeData').textContent = 'Data: ' + dataFormatada + ' - ' + hora;
+    }
+    
+    // Secretário Responsável
+    if (dados.customFields && dados.customFields.moeyz8lw23nk9y8h5kp) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.customFields.moeyz8lw23nk9y8h5kp;
+    }
 }
 
 
@@ -1798,6 +1876,59 @@ document.addEventListener('DOMContentLoaded', function() {
 }); // Fim do DOMContentLoaded
 
 
+</script>
+
+<script>
+// SISTEMA DE PAGINAÇÃO - MÉTODO GARANTIDO
+(function() {
+    
+    function criarPaginacao() {
+        const container = document.querySelector('.pagina-impressao');
+        if (!container) return;
+        
+        // Guarda o conteúdo original
+        const conteudoOriginal = container.innerHTML;
+        
+        // Altura útil de uma página A4 em pixels
+        const ALTURA_PAGINA = 1050; // Um pouco menor para margem de segurança
+        
+        // Cria um elemento temporário para medir
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:absolute;visibility:hidden;width:210mm;';
+        temp.innerHTML = conteudoOriginal;
+        document.body.appendChild(temp);
+        
+        // Calcula número de páginas
+        const alturaTotal = temp.scrollHeight;
+        const totalPaginas = Math.max(1, Math.ceil(alturaTotal / ALTURA_PAGINA));
+        document.body.removeChild(temp);
+        
+        // Atualiza o rodapé com a informação correta
+        const spanPagina = document.querySelector('.page-number');
+        if (spanPagina) {
+            spanPagina.innerHTML = '<span class="pagina-atual">1</span> de <span class="pagina-total">' + totalPaginas + '</span>';
+        }
+        
+        // Guarda o total para uso na impressão
+        window.__totalPaginas = totalPaginas;
+    }
+
+    // Executa quando carrega
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(criarPaginacao, 500);
+    });
+    
+    // Executa antes de imprimir
+    window.onbeforeprint = function() {
+        criarPaginacao();
+    };
+    
+    // Também executa quando a janela redimensiona
+    window.addEventListener('resize', function() {
+        setTimeout(criarPaginacao, 300);
+    });
+
+})();
 </script>
 </body>
 </html>
