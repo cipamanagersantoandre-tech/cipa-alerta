@@ -473,7 +473,7 @@
 }
 
 
-    /* SISTEMA DE PAGINAÇÃO - MÉTODO HÍBRIDO */
+    /* ESTILO DO RODAPÉ DE IMPRESSÃO */
     .rodape-impressao {
         position: fixed;
         bottom: 0;
@@ -488,19 +488,17 @@
         color: #666;
         z-index: 9999;
     }
-    
-    /* Força quebra de página entre as divs de página */
-    .pagina-fisica {
-        page-break-after: always;
-        width: 210mm;
-        min-height: 297mm;
-        padding: 5mm;
-        background: white;
-        box-sizing: border-box;
+
+    .pagina-impressao {
+        padding-bottom: 40px; /* Espaço para o rodapé não cobrir o texto */
     }
     
-    .pagina-fisica:last-child {
-        page-break-after: avoid;
+    .rodape-esquerda {
+        text-align: left;
+    }
+    
+    .rodape-direita {
+        text-align: right;
     }
 }
 
@@ -810,9 +808,9 @@
         <span id="rodapeSecretario">Secretário: </span>
     </div>
     <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
-    <div class="rodape-direita">
-        Página <span class="page-number">1 de 1</span>
-    </div>
+<div class="rodape-direita">
+    Página <span class="page-number"></span>
+</div>
 </div>
 
 </div> <!-- Fim do container principal -->
@@ -1879,55 +1877,36 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// SISTEMA DE PAGINAÇÃO - MÉTODO GARANTIDO
+// CORREÇÃO DA PAGINAÇÃO (EXECUTA NA IMPRESSÃO E AO CARREGAR)
 (function() {
-    
-    function criarPaginacao() {
-        const container = document.querySelector('.pagina-impressao');
-        if (!container) return;
-        
-        // Guarda o conteúdo original
-        const conteudoOriginal = container.innerHTML;
-        
-        // Altura útil de uma página A4 em pixels
-        const ALTURA_PAGINA = 1050; // Um pouco menor para margem de segurança
-        
-        // Cria um elemento temporário para medir
-        const temp = document.createElement('div');
-        temp.style.cssText = 'position:absolute;visibility:hidden;width:210mm;';
-        temp.innerHTML = conteudoOriginal;
-        document.body.appendChild(temp);
-        
-        // Calcula número de páginas
-        const alturaTotal = temp.scrollHeight;
-        const totalPaginas = Math.max(1, Math.ceil(alturaTotal / ALTURA_PAGINA));
-        document.body.removeChild(temp);
-        
-        // Atualiza o rodapé com a informação correta
-        const spanPagina = document.querySelector('.page-number');
-        if (spanPagina) {
-            spanPagina.innerHTML = '<span class="pagina-atual">1</span> de <span class="pagina-total">' + totalPaginas + '</span>';
-        }
-        
-        // Guarda o total para uso na impressão
-        window.__totalPaginas = totalPaginas;
+    // Função que atualiza o total de páginas
+    function atualizarTotalPaginas() {
+        // Espera um pouquinho para o conteúdo renderizar completamente
+        setTimeout(function() {
+            const elementoPagina = document.querySelector('.pagina-impressao');
+            if (elementoPagina) {
+                // Calcula a altura total do documento dividido pela altura de uma página A4 (~1100px)
+                // Adicionamos um pequeno offset para evitar arredondamentos errados
+                const totalPaginas = Math.ceil((elementoPagina.scrollHeight + 20) / 1100);
+                
+                // Define o total em todos os rodapés
+                const totais = document.querySelectorAll('.total-pages');
+                totais.forEach(el => {
+                    el.textContent = totalPaginas;
+                });
+            }
+        }, 100); // Aguarda 100ms para garantir que o layout esteja pronto
     }
 
-    // Executa quando carrega
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(criarPaginacao, 500);
-    });
-    
-    // Executa antes de imprimir
+    // Executa quando a impressão for solicitada
     window.onbeforeprint = function() {
-        criarPaginacao();
+        atualizarTotalPaginas();
     };
-    
-    // Também executa quando a janela redimensiona
-    window.addEventListener('resize', function() {
-        setTimeout(criarPaginacao, 300);
-    });
 
+    // Executa sempre que a página for carregada (para rascunhos)
+    document.addEventListener('DOMContentLoaded', function() {
+        atualizarTotalPaginas();
+    });
 })();
 </script>
 </body>
