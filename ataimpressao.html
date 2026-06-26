@@ -470,6 +470,33 @@
     .tabela-desligamento tr:last-child td {
         border-bottom: 1px solid #999 !important;
     }
+
+    /* SISTEMA DE PAGINAÇÃO AUTOMÁTICA */
+    .rodape-impressao {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 5px 10px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #666;
+        z-index: 9999;
+    }
+    
+    /* Aqui está o segredo: usa o contador automático do navegador */
+    .page-number::after {
+        content: counter(page) " de " counter(pages);
+    }
+    
+    /* Inicia os contadores de página */
+    @page {
+        counter-increment: page;
+    }
+
 }
 
 
@@ -1877,52 +1904,27 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// SISTEMA DE PAGINAÇÃO PARA IMPRESSÃO
+// SISTEMA DE PAGINAÇÃO (atualizado para usar CSS counter)
 (function() {
     
     function atualizarPaginacao() {
-        const container = document.querySelector('.pagina-impressao');
-        if (!container) return;
-        
-        // ALTURA ÚTIL DE UMA PÁGINA A4 (em pixels)
-        // Papel A4 = 297mm. Margens = 3mm em cima e 3mm embaixo = 291mm úteis
-        // 1mm ≈ 3.78px. Então: 291 × 3.78 ≈ 1100px
-        const ALTURA_PAGINA = 1100;
-        
-        // Altura total do conteúdo
-        const alturaTotal = container.scrollHeight;
-        
-        // Calcula número total de páginas
-        const totalPaginas = Math.ceil(alturaTotal / ALTURA_PAGINA);
-        
-        // Se for 0 páginas, coloca 1 como mínimo
-        const paginasFinal = totalPaginas < 1 ? 1 : totalPaginas;
-        
-        // Atualiza o texto no rodapé
         const spanPagina = document.querySelector('.page-number');
         if (spanPagina) {
-            spanPagina.textContent = '1 de ' + paginasFinal;
+            // Limpa qualquer texto que o JavaScript colocou
+            // O CSS counter(page) vai preencher automaticamente na impressão
+            spanPagina.textContent = '';
         }
-        
-        // Guarda o total para usar depois
-        window.__totalPaginas = paginasFinal;
     }
 
-    // Atualiza quando a página carrega
+    // Executa quando a página carrega
     document.addEventListener('DOMContentLoaded', function() {
-        // Pequeno atraso para garantir que tudo renderizou
         setTimeout(atualizarPaginacao, 300);
     });
     
-    // Atualiza ANTES de imprimir (quando o usuário clica em imprimir)
+    // Executa antes de imprimir
     window.onbeforeprint = function() {
         atualizarPaginacao();
     };
-    
-    // Se o usuário redimensionar a tela, recalcula
-    window.addEventListener('resize', function() {
-        setTimeout(atualizarPaginacao, 200);
-    });
 
 })();
 </script>
