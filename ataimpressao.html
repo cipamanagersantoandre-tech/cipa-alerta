@@ -823,7 +823,7 @@
     </div>
     <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
 <div class="rodape-direita">
-    Página <span class="page-number"></span>
+    Página <span class="page-number"></span> de <span class="total-pages"></span>
 </div>
 </div>
 
@@ -1888,9 +1888,21 @@ document.addEventListener('DOMContentLoaded', function() {
 }); // Fim do DOMContentLoaded
 
 
-</script>
-
 <script>
+// ===== CONTROLE MANUAL DE PÁGINAS =====
+document.getElementById('btnDefinirTotalPaginas').addEventListener('click', function() {
+    const total = document.getElementById('inputTotalPaginas').value.trim();
+    if (total && parseInt(total) > 0) {
+        const totais = document.querySelectorAll('.total-pages');
+        totais.forEach(el => {
+            el.textContent = total;
+        });
+        showAlert('✅ Total de páginas definido para ' + total + '!');
+    } else {
+        showAlert('❌ Digite um número válido (maior que 0)!');
+    }
+});
+</script>
 
 </script>
 </body>
