@@ -481,6 +481,35 @@
 }
 
 
+    /* ESTILO DO RODAPÉ DE IMPRESSÃO */
+    .rodape-impressao {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 5px 10px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #666;
+        z-index: 9999;
+    }
+
+    .pagina-impressao {
+        padding-bottom: 40px; /* Espaço para o rodapé não cobrir o texto */
+    }
+    
+    .rodape-esquerda {
+        text-align: left;
+    }
+    
+    .rodape-direita {
+        text-align: right;
+    }
+}
+
 @page { 
     size: A4; 
     margin: 3mm;
@@ -749,7 +778,7 @@
 </div>
 
 
-</div>
+    </div>
 </div>
 
 <!-- MODAL DE CONFIGURAÇÕES DE SETORES E EMAILS -->
@@ -778,6 +807,21 @@
 
     </div>
 </div>
+
+<!-- RODAPÉ DA PÁGINA (APARECE SOMENTE NA IMPRESSÃO) -->
+<div class="rodape-impressao">
+    <!-- LADO ESQUERDO: DATA E SECRETÁRIO -->
+    <div class="rodape-esquerda">
+        <span id="rodapeData">Data: </span><br>
+        <span id="rodapeSecretario">Secretário: </span>
+    </div>
+    <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
+    <div class="rodape-direita">
+        Página <span class="page-number"></span> de <span class="total-pages"></span>
+    </div>
+</div>
+
+</div> <!-- Fim do container principal -->
 
 <script>
 
@@ -1725,6 +1769,20 @@ function preencherCamposAta(dados) {
     
     // 8. GERENTE (não tem no JSON, deixamos em branco)
     // document.getElementById('nomeGerente').value = '';
+
+    // ===== ATUALIZAR RODAPÉ =====
+    // Data e Hora
+    if (dados.secao1 && dados.secao1.dataReuniao) {
+        const data = new Date(dados.secao1.dataReuniao + 'T00:00:00');
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        const hora = dados.secao1.horaInicio || '';
+        document.getElementById('rodapeData').textContent = 'Data: ' + dataFormatada + ' - ' + hora;
+    }
+    
+    // Secretário Responsável
+    if (dados.customFields && dados.customFields.moeyz8lw23nk9y8h5kp) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.customFields.moeyz8lw23nk9y8h5kp;
+    }
 }
 
 
@@ -1809,6 +1867,23 @@ document.addEventListener('DOMContentLoaded', function() {
 }); // Fim do DOMContentLoaded
 
 
+</script>
+
+<script>
+// CORREÇÃO DA PAGINAÇÃO (EXECUTA NA IMPRESSÃO)
+(function() {
+    // Só executa quando a impressão for solicitada
+    window.onbeforeprint = function() {
+        // Conta quantas páginas o navegador vai gerar (não é perfeito, mas funciona na maioria dos casos)
+        const totalPaginas = Math.ceil(document.querySelector('.pagina-impressao').scrollHeight / 1100); // ~1100px por página A4
+        
+        // Define o total em todos os rodapés
+        const totais = document.querySelectorAll('.total-pages');
+        totais.forEach(el => {
+            el.textContent = totalPaginas;
+        });
+    };
+})();
 </script>
 </body>
 </html>
