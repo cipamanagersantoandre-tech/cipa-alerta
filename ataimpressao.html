@@ -471,27 +471,6 @@
         border-bottom: 1px solid #999 !important;
     }
 
-    /* SISTEMA DE PAGINAÇÃO - FUNCIONA EM TODOS OS NAVEGADORES */
-    .rodape-impressao {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: white;
-        padding: 5px 10px;
-        border-top: 1px solid #ccc;
-        display: flex;
-        justify-content: space-between;
-        font-size: 10px;
-        color: #666;
-        z-index: 9999;
-    }
-    
-    /* Mostra número da página atual e total */
-    .page-number::before {
-        content: counter(page) " de " counter(pages);
-    }
-
 }
 
 
@@ -527,12 +506,6 @@
 @page { 
     size: A4; 
     margin: 3mm;
-    margin-top: 0.5cm;
-    
-    /* INICIA O CONTADOR DE PÁGINAS */
-    @bottom-center {
-        content: none;
-    }
 }
 
 /* Removemos o cabecalho-impressao antigo, pois agora o cabeçalho está dentro da tabela */
@@ -834,10 +807,10 @@
         <span id="rodapeData">Data: </span><br>
         <span id="rodapeSecretario">Secretário: </span>
     </div>
-    <!-- LADO DIREITO: NUMERAÇÃO DE PÁGINAS -->
-<div class="rodape-direita">
-    Página <span class="page-number"></span>
-</div>
+    <!-- LADO DIREITO -->
+    <div class="rodape-direita">
+        — 
+    </div>
 </div>
 
 </div> <!-- Fim do container principal -->
@@ -1901,43 +1874,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }); // Fim do DOMContentLoaded
 
 
-</script>
-
-<script>
-// SISTEMA DE PAGINAÇÃO - CONTA RODAPÉS PARA NUMERAR AS PÁGINAS
-(function() {
-    
-    function numerarPaginas() {
-        // Pega todos os rodapés de impressão
-        const rodapes = document.querySelectorAll('.rodape-impressao');
-        const totalPaginas = rodapes.length;
-        
-        if (totalPaginas === 0) return;
-        
-        // Numera cada rodapé: Página 1 de X, Página 2 de X...
-        rodapes.forEach((rodape, index) => {
-            const numeroPagina = index + 1;
-            const spanPagina = rodape.querySelector('.page-number');
-            if (spanPagina) {
-                spanPagina.textContent = numeroPagina + ' de ' + totalPaginas;
-            }
-        });
-    }
-
-    // Executa quando a página carrega
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(numerarPaginas, 500);
-    });
-    
-    // Executa antes de imprimir
-    window.onbeforeprint = function() {
-        numerarPaginas();
-    };
-    
-    // Se houver mudança na página (ex: após buscar ata), renumera
-    setTimeout(numerarPaginas, 2000);
-
-})();
 </script>
 </body>
 </html>
