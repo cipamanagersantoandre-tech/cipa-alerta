@@ -1348,38 +1348,38 @@ async function enviarParaSetorModal() {
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
         
         const corpo = `
-📋 ATA DE REUNIÃO ORDINÁRIA DE CIPA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ATA DE REUNIAO ORDINARIA DE CIPA
+================================
 
-📌 DADOS GERAIS:
-• Unidade: ${dados.unidade}
-• Data: ${dados.dataRealizacao}
-• Nº de Empregados: ${dados.numEmpregados}
-• CNAE/Risco: ${dados.cnaeRisco || 'Não informado'}
-• Nº de Integrantes: ${dados.numIntegrantes || 'Não informado'}
-• Mandato: ${dados.mandato || 'Não informado'}
-• Secretário: ${dados.secretario || 'Não informado'}
+DADOS GERAIS:
+- Unidade: ${dados.unidade}
+- Data: ${dados.dataRealizacao}
+- N de Empregados: ${dados.numEmpregados}
+- CNAE/Risco: ${dados.cnaeRisco || 'Nao informado'}
+- N de Integrantes: ${dados.numIntegrantes || 'Nao informado'}
+- Mandato: ${dados.mandato || 'Nao informado'}
+- Secretario: ${dados.secretario || 'Nao informado'}
 
-👥 REPRESENTANTES DO EMPREGADOR:
-• Presidente: ${dados.repEmpregadorPresidente || 'Não informado'}
-• Suplente: ${dados.repEmpregadorSuplente || 'Não informado'}
+REPRESENTANTES DO EMPREGADOR:
+- Presidente: ${dados.repEmpregadorPresidente || 'Nao informado'}
+- Suplente: ${dados.repEmpregadorSuplente || 'Nao informado'}
 
-👥 REPRESENTANTES DOS EMPREGADOS:
-• Vice-Presidente: ${dados.repEmpregadoVice || 'Não informado'}
-• Suplente: ${dados.repEmpregadoSuplente || 'Não informado'}
+REPRESENTANTES DOS EMPREGADOS:
+- Vice-Presidente: ${dados.repEmpregadoVice || 'Nao informado'}
+- Suplente: ${dados.repEmpregadoSuplente || 'Nao informado'}
 
-⚠️ ACIDENTES DO TRABALHO:
+ACIDENTES DO TRABALHO:
 Houve acidentes? ${dados.houveAcidente}
 ${dados.detalheAcidente ? dados.detalheAcidente : 'Nenhum detalhe informado.'}
 
-📝 ASSUNTOS ABORDADOS:
-${dados.assuntosAbordados || 'Não informado'}
+ASSUNTOS ABORDADOS:
+${dados.assuntosAbordados || 'Nao informado'}
 
-👤 GERENTE DA UNIDADE:
-${dados.nomeGerente || 'Não informado'}
+GERENTE DA UNIDADE:
+${dados.nomeGerente || 'Nao informado'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔗 Link para visualizar: ${link}
+================================
+Link para visualizar: ${link}
         `;
         
         const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
