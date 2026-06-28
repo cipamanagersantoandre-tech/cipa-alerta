@@ -1348,33 +1348,39 @@ async function enviarParaSetorModal() {
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
         
         const corpo = `
-ATA DE REUNIÃO ORDINÁRIA DE CIPA
+📋 ATA DE REUNIÃO ORDINÁRIA DE CIPA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Unidade: ${dados.unidade}
-Data: ${dados.dataRealizacao}
-Nº de Empregados: ${dados.numEmpregados}
-CNAE/Risco: ${dados.cnaeRisco || 'Não informado'}
-Nº de Integrantes: ${dados.numIntegrantes || 'Não informado'}
-Mandato: ${dados.mandato || 'Não informado'}
-Secretário: ${dados.secretario || 'Não informado'}
+📌 DADOS GERAIS:
+• Unidade: ${dados.unidade}
+• Data: ${dados.dataRealizacao}
+• Nº de Empregados: ${dados.numEmpregados}
+• CNAE/Risco: ${dados.cnaeRisco || 'Não informado'}
+• Nº de Integrantes: ${dados.numIntegrantes || 'Não informado'}
+• Mandato: ${dados.mandato || 'Não informado'}
+• Secretário: ${dados.secretario || 'Não informado'}
 
-Representantes do Empregador:
-- Presidente: ${dados.repEmpregadorPresidente || 'Não informado'}
-- Suplente: ${dados.repEmpregadorSuplente || 'Não informado'}
+👥 REPRESENTANTES DO EMPREGADOR:
+• Presidente: ${dados.repEmpregadorPresidente || 'Não informado'}
+• Suplente: ${dados.repEmpregadorSuplente || 'Não informado'}
 
-Representantes dos Empregados:
-- Vice-Presidente: ${dados.repEmpregadoVice || 'Não informado'}
-- Suplente: ${dados.repEmpregadoSuplente || 'Não informado'}
+👥 REPRESENTANTES DOS EMPREGADOS:
+• Vice-Presidente: ${dados.repEmpregadoVice || 'Não informado'}
+• Suplente: ${dados.repEmpregadoSuplente || 'Não informado'}
 
-Acidentes: ${dados.houveAcidente}
-${dados.detalheAcidente ? 'Detalhes:\n' + dados.detalheAcidente : ''}
+⚠️ ACIDENTES DO TRABALHO:
+Houve acidentes? ${dados.houveAcidente}
+${dados.detalheAcidente ? dados.detalheAcidente : 'Nenhum detalhe informado.'}
 
-Assuntos Abordados:
+📝 ASSUNTOS ABORDADOS:
 ${dados.assuntosAbordados || 'Não informado'}
 
-Gerente: ${dados.nomeGerente || 'Não informado'}
+👤 GERENTE DA UNIDADE:
+${dados.nomeGerente || 'Não informado'}
 
-Link para visualizar: ${link}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 Link para visualizar: ${link}
+        `;
         `;
         
         const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
