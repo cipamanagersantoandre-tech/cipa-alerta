@@ -1166,9 +1166,17 @@ function preencherCampos(dados) {
     } else {
         document.getElementById('campoAcidenteSimNao').value = '';
     }
-    
+
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
     if (dados.nomeGerente) document.getElementById('nomeGerente').value = dados.nomeGerente;
+    
+    // Atualizar rodapé
+    if (dados.dataRealizacao) {
+        document.getElementById('rodapeData').textContent = 'Data: ' + dados.dataRealizacao;
+    }
+    if (dados.secretario) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.secretario;
+    }
 }
 
 function coletarDados() {
