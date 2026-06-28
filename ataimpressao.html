@@ -1062,9 +1062,16 @@ async function removerSetor(id) {
 
 // ===== FUNÇÕES DE COMUNICAÇÃO COM A PLANILHA =====
 async function salvarAtaNaPlanilha(id, dados) {
-    const dadosStr = encodeURIComponent(JSON.stringify(dados));
-    const url = `${GOOGLE_API_URL}?acao=salvar&aba=${ABA_PLANILHA}&id=${encodeURIComponent(id)}&dados=${dadosStr}`;
-    const response = await fetch(url);
+    const dadosStr = JSON.stringify(dados);
+    const url = `${GOOGLE_API_URL}?acao=salvar&aba=${ABA_PLANILHA}&id=${encodeURIComponent(id)}`;
+    
+    const formData = new FormData();
+    formData.append('dados', dadosStr);
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+    });
     return await response.json();
 }
 
