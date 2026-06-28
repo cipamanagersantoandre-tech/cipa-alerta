@@ -540,7 +540,7 @@
             </div>
 
             <button class="btn-topo btn-topo-azul" id="btnEnviarSetor">📤 Enviar para o Setor</button>
-            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver ATA</button>
+            <button class="btn-topo btn-topo-laranja" id="btnDevolverAlerta">📤 Devolver Alerta</button>
             <button class="btn-topo" id="btnConfiguracoes" style="background: #4b5563; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px;">⚙️ Configurações</button>
             
             <!-- NOVO CAMPO E BOTÃO DE BUSCA (COM LISTA SUSPENSA) -->
@@ -1348,38 +1348,33 @@ async function enviarParaSetorModal() {
         const link = window.location.href.split('?')[0] + '?id=' + idAtual;
         
         const corpo = `
-📋 ATA DE REUNIÃO ORDINÁRIA DE CIPA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ATA DE REUNIÃO ORDINÁRIA DE CIPA
 
-📌 DADOS GERAIS:
-• Unidade: ${dados.unidade}
-• Data: ${dados.dataRealizacao}
-• Nº de Empregados: ${dados.numEmpregados}
-• CNAE/Risco: ${dados.cnaeRisco || 'Não informado'}
-• Nº de Integrantes: ${dados.numIntegrantes || 'Não informado'}
-• Mandato: ${dados.mandato || 'Não informado'}
-• Secretário: ${dados.secretario || 'Não informado'}
+Unidade: ${dados.unidade}
+Data: ${dados.dataRealizacao}
+Nº de Empregados: ${dados.numEmpregados}
+CNAE/Risco: ${dados.cnaeRisco || 'Não informado'}
+Nº de Integrantes: ${dados.numIntegrantes || 'Não informado'}
+Mandato: ${dados.mandato || 'Não informado'}
+Secretário: ${dados.secretario || 'Não informado'}
 
-👥 REPRESENTANTES DO EMPREGADOR:
-• Presidente: ${dados.repEmpregadorPresidente || 'Não informado'}
-• Suplente: ${dados.repEmpregadorSuplente || 'Não informado'}
+Representantes do Empregador:
+- Presidente: ${dados.repEmpregadorPresidente || 'Não informado'}
+- Suplente: ${dados.repEmpregadorSuplente || 'Não informado'}
 
-👥 REPRESENTANTES DOS EMPREGADOS:
-• Vice-Presidente: ${dados.repEmpregadoVice || 'Não informado'}
-• Suplente: ${dados.repEmpregadoSuplente || 'Não informado'}
+Representantes dos Empregados:
+- Vice-Presidente: ${dados.repEmpregadoVice || 'Não informado'}
+- Suplente: ${dados.repEmpregadoSuplente || 'Não informado'}
 
-⚠️ ACIDENTES DO TRABALHO:
-Houve acidentes? ${dados.houveAcidente}
-${dados.detalheAcidente ? dados.detalheAcidente : 'Nenhum detalhe informado.'}
+Acidentes: ${dados.houveAcidente}
+${dados.detalheAcidente ? 'Detalhes:\n' + dados.detalheAcidente : ''}
 
-📝 ASSUNTOS ABORDADOS:
+Assuntos Abordados:
 ${dados.assuntosAbordados || 'Não informado'}
 
-👤 GERENTE DA UNIDADE:
-${dados.nomeGerente || 'Não informado'}
+Gerente: ${dados.nomeGerente || 'Não informado'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔗 Link para visualizar: ${link}
+Link para visualizar: ${link}
         `;
         
         const emailResultado = await enviarEmailComAnexos(emails, assunto, corpo, idAtual, []);
