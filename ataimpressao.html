@@ -1160,14 +1160,6 @@ function preencherCampos(dados) {
     
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
     if (dados.nomeGerente) document.getElementById('nomeGerente').value = dados.nomeGerente;
-    
-    // ===== ATUALIZAR RODAPÉ =====
-    if (dados.dataRealizacao) {
-        document.getElementById('rodapeData').textContent = 'Data: ' + dados.dataRealizacao;
-    }
-    if (dados.secretario) {
-        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.secretario;
-    }
 }
 
 function coletarDados() {
@@ -1179,8 +1171,7 @@ function coletarDados() {
         numIntegrantes: document.getElementById('numIntegrantes').value.trim(),
         mandato: document.getElementById('mandato').value.trim(),
         secretario: document.getElementById('secretario').value.trim(),
-        houveDesligamento: document.getElementById('campoSimNao').value.trim(),
-        textoDesligamento: document.getElementById('textoDesligamento').value.trim(),
+	textoDesligamento: document.getElementById('textoDesligamento').value.trim(),
         repEmpregadorPresidente: document.getElementById('repEmpregadorPresidente').value.trim(),
         repEmpregadorSuplente: document.getElementById('repEmpregadorSuplente').value.trim(),
         repEmpregadoVice: document.getElementById('repEmpregadoVice').value.trim(),
