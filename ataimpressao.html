@@ -470,12 +470,34 @@
     .tabela-desligamento tr:last-child td {
         border-bottom: 1px solid #999 !important;
     }
+
+    /* RODAPÉ DE IMPRESSÃO */
+    .rodape-impressao {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 5px 10px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #666;
+        z-index: 9999;
+    }
+
+
 }
 
 @page { 
     size: A4; 
     margin: 3mm;
     margin-top: 0.5cm; /* Margem menor pois o cabeçalho será gerado automaticamente */
+}
+
+.pagina-impressao {
+    padding-bottom: 40px;
 }
 
 /* Removemos o cabecalho-impressao antigo, pois agora o cabeçalho está dentro da tabela */
@@ -740,6 +762,15 @@
 
 </div>
 </div>
+
+<!-- RODAPÉ DA PÁGINA (APARECE SOMENTE NA IMPRESSÃO) -->
+<div class="rodape-impressao">
+    <div style="text-align: left;">
+        <span id="rodapeData">Data: </span><br>
+        <span id="rodapeSecretario">Secretário: </span>
+    </div>
+</div>
+
 
 <!-- MODAL DE CONFIGURAÇÕES DE SETORES E EMAILS -->
 <div id="painelSetores" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
@@ -1714,6 +1745,17 @@ function preencherCamposAta(dados) {
     
     // 8. GERENTE (não tem no JSON, deixamos em branco)
     // document.getElementById('nomeGerente').value = '';
+
+    // ===== ATUALIZAR RODAPÉ =====
+    if (dados.secao1 && dados.secao1.dataReuniao) {
+        const data = new Date(dados.secao1.dataReuniao + 'T00:00:00');
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        const hora = dados.secao1.horaInicio || '';
+        document.getElementById('rodapeData').textContent = 'Data: ' + dataFormatada + ' - ' + hora;
+    }
+    if (dados.customFields && dados.customFields.moeyz8lw23nk9y8h5kp) {
+        document.getElementById('rodapeSecretario').textContent = 'Secretário: ' + dados.customFields.moeyz8lw23nk9y8h5kp;
+    }
 }
 
 
