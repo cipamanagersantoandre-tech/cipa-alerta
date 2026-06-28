@@ -1158,6 +1158,15 @@ function preencherCampos(dados) {
     
     if (dados.detalheAcidente) document.getElementById('detalheAcidente').value = dados.detalheAcidente;
     
+    // BLOCO 4: ACIDENTES - SIM/NÃO
+    if (dados.houveAcidente === 'Sim' || dados.houveAcidente === 'SIM') {
+        document.getElementById('campoAcidenteSimNao').value = 'Sim';
+    } else if (dados.houveAcidente === 'Não' || dados.houveAcidente === 'NÃO') {
+        document.getElementById('campoAcidenteSimNao').value = 'Não';
+    } else {
+        document.getElementById('campoAcidenteSimNao').value = '';
+    }
+    
     if (dados.assuntosAbordados) document.getElementById('assuntosAbordados').value = dados.assuntosAbordados;
     if (dados.nomeGerente) document.getElementById('nomeGerente').value = dados.nomeGerente;
 }
